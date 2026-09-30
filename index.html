@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#f7f7f4" />
-  <title>Connect CRM v001</title>
+  <meta name="theme-color" content="#f7f8f5" />
+  <title>Connect CRM v003</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
@@ -13,24 +13,27 @@
       <div>
         <div class="brand">
           <div class="brand-mark">C</div>
-          <div>
+          <div class="brand-copy">
             <strong>Connect CRM</strong>
-            <span>v001 mock</span>
+            <span>Personal relationship CRM</span>
           </div>
         </div>
 
         <nav class="nav" aria-label="メインメニュー">
           <button class="nav-item active" data-view="dashboard">
-            <span>⌂</span><span>ホーム</span>
+            <span class="nav-icon">⌂</span><span>ホーム</span>
           </button>
           <button class="nav-item" data-view="contacts">
-            <span>◎</span><span>つながり</span>
+            <span class="nav-icon">◎</span><span>つながり</span>
           </button>
           <button class="nav-item" data-view="prospects">
-            <span>↗</span><span>クライアント候補</span>
+            <span class="nav-icon">↗</span><span>クライアント候補</span>
           </button>
           <button class="nav-item" data-view="actions">
-            <span>✓</span><span>次回アクション</span>
+            <span class="nav-icon">✓</span><span>次回アクション</span>
+          </button>
+          <button class="nav-item" data-view="network">
+            <span class="nav-icon">◌</span><span>関係マップ</span>
           </button>
         </nav>
       </div>
@@ -47,181 +50,231 @@
     </aside>
 
     <main class="main">
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">PERSONAL CRM</p>
-          <h1 id="pageTitle">ホーム</h1>
-        </div>
-        <button class="primary-btn" id="addContactBtn">＋ 人を追加</button>
-      </header>
+      <div class="page-container">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">PERSONAL CRM</p>
+            <h1 id="pageTitle">ホーム</h1>
+          </div>
+          <button class="primary-btn" id="addContactBtn">＋ 人を追加</button>
+        </header>
 
-      <section class="view active" id="dashboardView">
-        <div class="hero-grid">
-          <article class="hero-card">
+        <section class="view active" id="dashboardView">
+          <section class="intro-card">
             <div>
               <p class="eyebrow">RELATIONSHIP FIRST</p>
-              <h2>人とのつながりから、<br />次の仕事を見つける。</h2>
-              <p class="hero-copy">
-                誰と、どこで、誰を介してつながったか。そこからどのサービスにつながる可能性があるかを、
-                一人ずつ丁寧に管理するためのCRMです。
-              </p>
+              <h2>人とのつながりを、次の仕事につなげる。</h2>
+              <p>「誰と・どこで・誰の紹介でつながったか」と「どのサービスにつながりそうか」を、一人ずつ整理して管理します。</p>
             </div>
-            <div class="hero-visual">
-              <div class="node node-a">YOU</div>
-              <div class="line line-a"></div>
-              <div class="node node-b">A</div>
-              <div class="line line-b"></div>
-              <div class="node node-c">B</div>
-              <div class="node node-d">C</div>
+          </section>
+
+          <section class="summary-section">
+            <div class="section-title-row">
+              <div>
+                <p class="eyebrow">OVERVIEW</p>
+                <h2 class="section-title">いまの状況</h2>
+              </div>
             </div>
-          </article>
 
-          <article class="metric-card accent">
-            <span>登録人数</span>
-            <strong id="metricContacts">0</strong>
-            <small>つながりを記録中</small>
-          </article>
-        </div>
+            <div class="metrics-grid">
+              <article class="metric-card">
+                <span class="metric-label">登録人数</span>
+                <strong id="metricContacts">0</strong>
+                <small>つながりを記録中</small>
+              </article>
+              <article class="metric-card">
+                <span class="metric-label">高優先度候補</span>
+                <strong id="metricHigh">0</strong>
+                <small>サービス単位の候補数</small>
+              </article>
+              <article class="metric-card">
+                <span class="metric-label">次回アクション</span>
+                <strong id="metricActions">0</strong>
+                <small>未完了の予定</small>
+              </article>
+              <article class="metric-card">
+                <span class="metric-label">紹介経由</span>
+                <strong id="metricIntroduced">0</strong>
+                <small>紹介元ありの人物</small>
+              </article>
+            </div>
+          </section>
 
-        <div class="metrics-grid">
-          <article class="metric-card">
-            <span>高優先度候補</span>
-            <strong id="metricHigh">0</strong>
-            <small>サービス単位の候補数</small>
-          </article>
-          <article class="metric-card">
-            <span>次回アクション</span>
-            <strong id="metricActions">0</strong>
-            <small>未完了の予定</small>
-          </article>
-          <article class="metric-card">
-            <span>紹介経由</span>
-            <strong id="metricIntroduced">0</strong>
-            <small>紹介元ありの人物</small>
-          </article>
-        </div>
+          <section class="dashboard-columns">
+            <article class="panel priority-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">NEXT ACTION</p>
+                  <h3>次にやること</h3>
+                  <p class="panel-subtitle">直近のフォロー予定を優先して表示します。</p>
+                </div>
+                <button class="text-btn" data-jump="actions">すべて見る</button>
+              </div>
+              <div id="upcomingActions" class="stack-list"></div>
+            </article>
 
-        <div class="dashboard-columns">
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">HIGH PRIORITY</p>
+                  <h3>優先クライアント候補</h3>
+                  <p class="panel-subtitle">「高」に設定したサービス候補です。</p>
+                </div>
+                <button class="text-btn" data-jump="prospects">すべて見る</button>
+              </div>
+              <div id="highPriorityList" class="stack-list"></div>
+            </article>
+          </section>
+
           <article class="panel">
             <div class="panel-head">
               <div>
-                <p class="eyebrow">NEXT ACTION</p>
-                <h3>近日のアクション</h3>
+                <p class="eyebrow">RECENT CONNECTIONS</p>
+                <h3>最近つながった人</h3>
+                <p class="panel-subtitle">新しい接点から関係を育てていきます。</p>
               </div>
-              <button class="text-btn" data-jump="actions">すべて見る</button>
+              <button class="text-btn" data-jump="contacts">一覧を見る</button>
             </div>
-            <div id="upcomingActions" class="stack-list"></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>名前</th>
+                    <th>出会いのきっかけ</th>
+                    <th>紹介元</th>
+                    <th>最終接点</th>
+                    <th>次回アクション</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="recentContactsTable"></tbody>
+              </table>
+            </div>
           </article>
+        </section>
+
+        <section class="view" id="contactsView">
+          <div class="section-intro">
+            <div>
+              <h2>つながり一覧</h2>
+              <p>人との関係、紹介経路、サービス候補をまとめて確認できます。</p>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <div class="search-box">
+              <span>⌕</span>
+              <input id="contactSearch" type="search" placeholder="名前・きっかけ・紹介元で検索" />
+            </div>
+            <select id="sourceFilter">
+              <option value="">すべての出会い</option>
+            </select>
+          </div>
 
           <article class="panel">
-            <div class="panel-head">
+            <div class="panel-head compact">
               <div>
-                <p class="eyebrow">HIGH PRIORITY</p>
-                <h3>優先クライアント候補</h3>
+                <p class="eyebrow">CONNECTIONS</p>
+                <h3>人物一覧</h3>
               </div>
-              <button class="text-btn" data-jump="prospects">すべて見る</button>
+              <span class="count-label" id="contactsCountLabel">0人</span>
             </div>
-            <div id="highPriorityList" class="stack-list"></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>人物</th>
+                    <th>出会いのきっかけ</th>
+                    <th>紹介元</th>
+                    <th>サービス候補</th>
+                    <th>次回アクション</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="contactsTable"></tbody>
+              </table>
+            </div>
           </article>
-        </div>
+        </section>
 
-        <article class="panel">
-          <div class="panel-head">
+        <section class="view" id="prospectsView">
+          <div class="section-intro">
             <div>
-              <p class="eyebrow">RECENT CONNECTIONS</p>
-              <h3>最近つながった人</h3>
+              <h2>クライアント候補</h2>
+              <p>人物ではなく「サービスごとの可能性」で優先順位を確認できます。</p>
             </div>
-            <button class="text-btn" data-jump="contacts">一覧を見る</button>
           </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>名前</th>
-                  <th>出会いのきっかけ</th>
-                  <th>紹介元</th>
-                  <th>最終接点</th>
-                  <th>次回アクション</th>
-                </tr>
-              </thead>
-              <tbody id="recentContactsTable"></tbody>
-            </table>
-          </div>
-        </article>
-      </section>
 
-      <section class="view" id="contactsView">
-        <div class="toolbar">
-          <div class="search-box">
-            <span>⌕</span>
-            <input id="contactSearch" type="search" placeholder="名前・きっかけ・紹介元で検索" />
+          <div class="toolbar">
+            <div class="segmented" id="prioritySegment">
+              <button class="active" data-priority="">すべて</button>
+              <button data-priority="high">高</button>
+              <button data-priority="medium">中</button>
+              <button data-priority="low">低</button>
+            </div>
+            <select id="serviceFilter">
+              <option value="">すべてのサービス</option>
+            </select>
           </div>
-          <select id="sourceFilter">
-            <option value="">すべての出会い</option>
-          </select>
-        </div>
+          <div id="prospectGrid" class="prospect-grid"></div>
+        </section>
 
-        <article class="panel">
-          <div class="panel-head">
+        <section class="view" id="actionsView">
+          <div class="section-intro">
             <div>
-              <p class="eyebrow">CONNECTIONS</p>
-              <h3>つながり一覧</h3>
+              <h2>次回アクション</h2>
+              <p>「次に誰へ何をするか」を一か所で確認します。</p>
             </div>
-            <span class="count-label" id="contactsCountLabel">0人</span>
           </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>人物</th>
-                  <th>出会いのきっかけ</th>
-                  <th>紹介元</th>
-                  <th>サービス候補</th>
-                  <th>次回アクション</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="contactsTable"></tbody>
-            </table>
-          </div>
-        </article>
-      </section>
 
-      <section class="view" id="prospectsView">
-        <div class="toolbar">
-          <div class="segmented" id="prioritySegment">
-            <button class="active" data-priority="">すべて</button>
-            <button data-priority="high">高</button>
-            <button data-priority="medium">中</button>
-            <button data-priority="low">低</button>
+          <div class="toolbar">
+            <div class="segmented" id="actionSegment">
+              <button class="active" data-action-filter="open">未完了</button>
+              <button data-action-filter="all">すべて</button>
+              <button data-action-filter="done">完了</button>
+            </div>
           </div>
-          <select id="serviceFilter">
-            <option value="">すべてのサービス</option>
-          </select>
-        </div>
-        <div id="prospectGrid" class="prospect-grid"></div>
-      </section>
 
-      <section class="view" id="actionsView">
-        <div class="toolbar">
-          <div class="segmented" id="actionSegment">
-            <button class="active" data-action-filter="open">未完了</button>
-            <button data-action-filter="all">すべて</button>
-            <button data-action-filter="done">完了</button>
-          </div>
-        </div>
+          <article class="panel">
+            <div class="panel-head compact">
+              <div>
+                <p class="eyebrow">FOLLOW UP</p>
+                <h3>アクション一覧</h3>
+              </div>
+              <span class="count-label" id="actionsCountLabel">0件</span>
+            </div>
+            <div id="actionsList" class="action-list"></div>
+          </article>
+        </section>
 
-        <article class="panel">
-          <div class="panel-head">
+        <section class="view" id="networkView">
+          <div class="section-intro">
             <div>
-              <p class="eyebrow">FOLLOW UP</p>
-              <h3>次回アクション一覧</h3>
+              <h2>関係マップ</h2>
+              <p>人物を指定すると、その人の紹介元と紹介先のつながりをマインドマップ風に確認できます。</p>
             </div>
-            <span class="count-label" id="actionsCountLabel">0件</span>
           </div>
-          <div id="actionsList" class="action-list"></div>
-        </article>
-      </section>
+
+          <article class="panel">
+            <div class="network-toolbar">
+              <div class="network-selector-wrap">
+                <label for="networkContactSelect">表示する人物</label>
+                <select id="networkContactSelect"></select>
+              </div>
+              <div class="network-stats" id="networkStats"></div>
+            </div>
+            <div class="network-map-wrap">
+              <div id="networkMapEmpty" class="empty-state hidden">人物が登録されると、ここに関係マップが表示されます。</div>
+              <svg id="networkMapSvg" class="network-map" viewBox="0 0 1000 540" preserveAspectRatio="xMidYMid meet" aria-label="人物関係マップ"></svg>
+            </div>
+            <div class="network-help">
+              <span><span class="legend-dot legend-center"></span>選択中の人物</span>
+              <span><span class="legend-dot legend-parent"></span>紹介元の流れ</span>
+              <span><span class="legend-dot legend-child"></span>紹介先の流れ</span>
+            </div>
+          </article>
+        </section>
+      </div>
     </main>
   </div>
 
