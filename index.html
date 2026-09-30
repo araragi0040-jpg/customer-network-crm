@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f7f7f4" />
+  <title>Connect CRM v001</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div>
+        <div class="brand">
+          <div class="brand-mark">C</div>
+          <div>
+            <strong>Connect CRM</strong>
+            <span>v001 mock</span>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="メインメニュー">
+          <button class="nav-item active" data-view="dashboard">
+            <span>⌂</span><span>ホーム</span>
+          </button>
+          <button class="nav-item" data-view="contacts">
+            <span>◎</span><span>つながり</span>
+          </button>
+          <button class="nav-item" data-view="prospects">
+            <span>↗</span><span>クライアント候補</span>
+          </button>
+          <button class="nav-item" data-view="actions">
+            <span>✓</span><span>次回アクション</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="account-card">
+          <div class="avatar">事</div>
+          <div>
+            <strong>事業主アカウント</strong>
+            <span>1ユーザー利用</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">PERSONAL CRM</p>
+          <h1 id="pageTitle">ホーム</h1>
+        </div>
+        <button class="primary-btn" id="addContactBtn">＋ 人を追加</button>
+      </header>
+
+      <section class="view active" id="dashboardView">
+        <div class="hero-grid">
+          <article class="hero-card">
+            <div>
+              <p class="eyebrow">RELATIONSHIP FIRST</p>
+              <h2>人とのつながりから、<br />次の仕事を見つける。</h2>
+              <p class="hero-copy">
+                誰と、どこで、誰を介してつながったか。そこからどのサービスにつながる可能性があるかを、
+                一人ずつ丁寧に管理するためのCRMです。
+              </p>
+            </div>
+            <div class="hero-visual">
+              <div class="node node-a">YOU</div>
+              <div class="line line-a"></div>
+              <div class="node node-b">A</div>
+              <div class="line line-b"></div>
+              <div class="node node-c">B</div>
+              <div class="node node-d">C</div>
+            </div>
+          </article>
+
+          <article class="metric-card accent">
+            <span>登録人数</span>
+            <strong id="metricContacts">0</strong>
+            <small>つながりを記録中</small>
+          </article>
+        </div>
+
+        <div class="metrics-grid">
+          <article class="metric-card">
+            <span>高優先度候補</span>
+            <strong id="metricHigh">0</strong>
+            <small>サービス単位の候補数</small>
+          </article>
+          <article class="metric-card">
+            <span>次回アクション</span>
+            <strong id="metricActions">0</strong>
+            <small>未完了の予定</small>
+          </article>
+          <article class="metric-card">
+            <span>紹介経由</span>
+            <strong id="metricIntroduced">0</strong>
+            <small>紹介元ありの人物</small>
+          </article>
+        </div>
+
+        <div class="dashboard-columns">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">NEXT ACTION</p>
+                <h3>近日のアクション</h3>
+              </div>
+              <button class="text-btn" data-jump="actions">すべて見る</button>
+            </div>
+            <div id="upcomingActions" class="stack-list"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">HIGH PRIORITY</p>
+                <h3>優先クライアント候補</h3>
+              </div>
+              <button class="text-btn" data-jump="prospects">すべて見る</button>
+            </div>
+            <div id="highPriorityList" class="stack-list"></div>
+          </article>
+        </div>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">RECENT CONNECTIONS</p>
+              <h3>最近つながった人</h3>
+            </div>
+            <button class="text-btn" data-jump="contacts">一覧を見る</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>名前</th>
+                  <th>出会いのきっかけ</th>
+                  <th>紹介元</th>
+                  <th>最終接点</th>
+                  <th>次回アクション</th>
+                </tr>
+              </thead>
+              <tbody id="recentContactsTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" id="contactsView">
+        <div class="toolbar">
+          <div class="search-box">
+            <span>⌕</span>
+            <input id="contactSearch" type="search" placeholder="名前・きっかけ・紹介元で検索" />
+          </div>
+          <select id="sourceFilter">
+            <option value="">すべての出会い</option>
+          </select>
+        </div>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">CONNECTIONS</p>
+              <h3>つながり一覧</h3>
+            </div>
+            <span class="count-label" id="contactsCountLabel">0人</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>人物</th>
+                  <th>出会いのきっかけ</th>
+                  <th>紹介元</th>
+                  <th>サービス候補</th>
+                  <th>次回アクション</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="contactsTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" id="prospectsView">
+        <div class="toolbar">
+          <div class="segmented" id="prioritySegment">
+            <button class="active" data-priority="">すべて</button>
+            <button data-priority="high">高</button>
+            <button data-priority="medium">中</button>
+            <button data-priority="low">低</button>
+          </div>
+          <select id="serviceFilter">
+            <option value="">すべてのサービス</option>
+          </select>
+        </div>
+        <div id="prospectGrid" class="prospect-grid"></div>
+      </section>
+
+      <section class="view" id="actionsView">
+        <div class="toolbar">
+          <div class="segmented" id="actionSegment">
+            <button class="active" data-action-filter="open">未完了</button>
+            <button data-action-filter="all">すべて</button>
+            <button data-action-filter="done">完了</button>
+          </div>
+        </div>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">FOLLOW UP</p>
+              <h3>次回アクション一覧</h3>
+            </div>
+            <span class="count-label" id="actionsCountLabel">0件</span>
+          </div>
+          <div id="actionsList" class="action-list"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="contactDialog" class="contact-dialog">
+    <form method="dialog" id="contactForm">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">CONTACT</p>
+          <h2 id="dialogTitle">人を追加</h2>
+        </div>
+        <button class="icon-btn" value="cancel" type="button" id="closeDialogBtn">×</button>
+      </div>
+
+      <input type="hidden" id="contactId" />
+
+      <div class="form-section">
+        <h3>基本情報</h3>
+        <div class="form-grid">
+          <label>
+            <span>名前 *</span>
+            <input id="nameInput" required placeholder="例：山田 太郎" />
+          </label>
+          <label>
+            <span>出会った日</span>
+            <input id="metDateInput" type="date" />
+          </label>
+          <label>
+            <span>出会いのきっかけ</span>
+            <input id="sourceInput" placeholder="例：交流会、紹介、SNS" />
+          </label>
+          <label>
+            <span>紹介元</span>
+            <input id="referrerInput" placeholder="例：佐藤さん" list="contactNames" />
+            <datalist id="contactNames"></datalist>
+          </label>
+        </div>
+
+        <label>
+          <span>人物メモ</span>
+          <textarea id="noteInput" rows="3" placeholder="どんな人か、話した内容、関係性など"></textarea>
+        </label>
+      </div>
+
+      <div class="form-section">
+        <div class="section-head-inline">
+          <div>
+            <h3>サービス候補</h3>
+            <p>サービスごとにクライアント候補優先度を設定できます。</p>
+          </div>
+          <button type="button" class="secondary-btn" id="addServiceRowBtn">＋ サービス追加</button>
+        </div>
+        <div id="serviceRows" class="service-rows"></div>
+      </div>
+
+      <div class="form-section">
+        <h3>次回アクション</h3>
+        <div class="form-grid">
+          <label>
+            <span>日付</span>
+            <input id="nextActionDateInput" type="date" />
+          </label>
+          <label>
+            <span>アクション</span>
+            <input id="nextActionInput" placeholder="例：LINEする、見積を送る" />
+          </label>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="danger-btn hidden" type="button" id="deleteContactBtn">削除</button>
+        <div class="spacer"></div>
+        <button class="secondary-btn" type="button" id="cancelDialogBtn">キャンセル</button>
+        <button class="primary-btn" type="submit">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <template id="serviceRowTemplate">
+    <div class="service-row">
+      <input class="service-name" placeholder="サービス名" />
+      <select class="service-priority">
+        <option value="high">高</option>
+        <option value="medium" selected>中</option>
+        <option value="low">低</option>
+      </select>
+      <button type="button" class="icon-btn remove-service-btn">×</button>
+    </div>
+  </template>
+
+  <script src="./app.js"></script>
+</body>
+</html>
