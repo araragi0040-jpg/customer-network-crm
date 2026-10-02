@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f7f8f5" />
-  <title>Connect CRM v005</title>
+  <title>Connect CRM v006</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
 <div class="app-shell">
   <aside class="sidebar">
     <div>
-      <div class="brand"><div class="brand-mark">C</div><div class="brand-copy"><strong>Connect CRM</strong><span>Relationship-first CRM</span></div></div>
+      <div class="brand"><div class="brand-mark">C</div><div class="brand-copy"><strong>Connect CRM</strong><span>Spreadsheet Sync v006</span></div></div>
       <nav class="nav">
         <button class="nav-item active" data-view="dashboard"><span class="nav-icon">⌂</span><span>ホーム</span></button>
         <button class="nav-item" data-view="contacts"><span class="nav-icon">◎</span><span>人物</span></button>
@@ -19,16 +19,22 @@
         <button class="nav-item" data-view="prospects"><span class="nav-icon">↗</span><span>候補</span></button>
         <button class="nav-item" data-view="actions"><span class="nav-icon">✓</span><span>アクション</span></button>
         <button class="nav-item" data-view="network"><span class="nav-icon">◌</span><span>関係マップ</span></button>
+        <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span><span>連携設定</span></button>
       </nav>
     </div>
-    <div class="sidebar-footer"><div class="account-card"><div class="avatar">事</div><div><strong>事業主アカウント</strong><span>1ユーザー利用</span></div></div></div>
+    <div class="sidebar-footer">
+      <div class="sync-card"><span id="syncDot" class="sync-dot offline"></span><div><strong id="syncLabel">ローカルモード</strong><span id="syncSubLabel">GAS未接続</span></div></div>
+    </div>
   </aside>
 
   <main class="main"><div class="page-container">
-    <header class="topbar"><div><p class="eyebrow">PERSONAL CRM</p><h1 id="pageTitle">ホーム</h1></div><button class="primary-btn" id="addContactBtn">＋ 人物を追加</button></header>
+    <header class="topbar">
+      <div><p class="eyebrow">PERSONAL CRM</p><h1 id="pageTitle">ホーム</h1></div>
+      <div class="top-actions"><span id="topSyncStatus" class="top-sync-status">ローカル保存</span><button class="primary-btn" id="addContactBtn">＋ 人物を追加</button></div>
+    </header>
 
     <section class="view active" id="dashboardView">
-      <section class="intro-card"><p class="eyebrow">RELATIONSHIP FIRST</p><h2>紹介の流れまで見える顧客管理。</h2><p>人物情報と紹介関係を分けて管理し、1人に複数の紹介元・紹介先があるネットワークもそのまま可視化します。</p></section>
+      <section class="intro-card"><p class="eyebrow">RELATIONSHIP FIRST</p><h2>紹介の流れまで見える顧客管理。</h2><p>人物・サービス候補・次回アクション・紹介関係をGoogleスプレッドシートに保存し、GitHub上のWebアプリからGAS経由で読み書きできます。</p></section>
       <div class="metrics-grid">
         <article class="metric-card"><span>登録人物</span><strong id="metricContacts">0</strong><small>人物マスタ</small></article>
         <article class="metric-card"><span>紹介関係</span><strong id="metricRelations">0</strong><small>紹介元 → 紹介先</small></article>
@@ -39,29 +45,29 @@
         <article class="panel"><div class="panel-head"><div><p class="eyebrow">NEXT ACTION</p><h3>次にやること</h3></div><button class="text-btn" data-jump="actions">すべて見る</button></div><div id="upcomingActions" class="stack-list"></div></article>
         <article class="panel"><div class="panel-head"><div><p class="eyebrow">NETWORK HUB</p><h3>紹介が広がっている人</h3></div><button class="text-btn" data-jump="network">マップを見る</button></div><div id="hubList" class="stack-list"></div></article>
       </div>
-      <article class="panel"><div class="panel-head"><div><p class="eyebrow">RECENT CONNECTIONS</p><h3>人物一覧プレビュー</h3></div><button class="text-btn" data-jump="contacts">一覧を見る</button></div><div class="table-wrap"><table><thead><tr><th>人物</th><th>出会い</th><th>紹介元</th><th>紹介先</th><th>優先度</th><th>次回アクション</th><th></th></tr></thead><tbody id="recentContactsTable"></tbody></table></div></article>
+      <article class="panel"><div class="panel-head"><div><p class="eyebrow">PEOPLE</p><h3>人物一覧プレビュー</h3></div><button class="text-btn" data-jump="contacts">一覧を見る</button></div><div class="table-wrap"><table><thead><tr><th>人物</th><th>出会い</th><th>紹介元</th><th>紹介先</th><th>優先度</th><th>次回アクション</th><th></th></tr></thead><tbody id="recentContactsTable"></tbody></table></div></article>
     </section>
 
     <section class="view" id="contactsView">
-      <div class="section-intro"><h2>人物マスタ</h2><p>人物そのものの情報を管理します。紹介関係は別テーブルで管理するため、複数の紹介元にも対応できます。</p></div>
+      <div class="section-intro"><h2>人物マスタ</h2><p>人物そのものを管理します。サービス候補・次回アクション・紹介関係はスプレッドシート上では別シートに分けて保存されます。</p></div>
       <div class="toolbar"><div class="search-box"><span>⌕</span><input id="contactSearch" type="search" placeholder="名前・きっかけ・サービスで検索" /></div><select id="sourceFilter"><option value="">すべての出会い</option></select></div>
       <article class="panel"><div class="panel-head compact"><div><p class="eyebrow">PEOPLE</p><h3>人物一覧</h3></div><span class="count-label" id="contactsCountLabel">0人</span></div><div class="table-wrap"><table><thead><tr><th>人物</th><th>出会い</th><th>紹介元</th><th>紹介先</th><th>サービス候補</th><th>次回アクション</th><th></th></tr></thead><tbody id="contactsTable"></tbody></table></div></article>
     </section>
 
     <section class="view" id="relationshipsView">
-      <div class="section-intro"><h2>紹介関係</h2><p><strong>紹介元 → 紹介先</strong> を1行1関係で管理します。同じ人物に複数の紹介元を登録できます。</p></div>
+      <div class="section-intro"><h2>紹介関係</h2><p><strong>紹介元 → 紹介先</strong> を1行1関係で管理します。同一人物に複数の紹介元を設定できます。</p></div>
       <div class="toolbar"><div class="search-box"><span>⌕</span><input id="relationshipSearch" type="search" placeholder="紹介元・紹介先・メモで検索" /></div><button class="primary-btn" id="addRelationshipBtn">＋ 紹介関係を追加</button></div>
       <article class="panel"><div class="panel-head compact"><div><p class="eyebrow">REFERRALS</p><h3>紹介元 → 紹介先</h3></div><span class="count-label" id="relationshipsCountLabel">0件</span></div><div class="table-wrap"><table><thead><tr><th>紹介元</th><th class="arrow-col">→</th><th>紹介先</th><th>メモ</th><th>登録日</th><th></th></tr></thead><tbody id="relationshipsTable"></tbody></table></div></article>
     </section>
 
     <section class="view" id="prospectsView">
-      <div class="section-intro"><h2>クライアント候補</h2><p>サービスごとに優先度「高・中・低」で確認できます。</p></div>
+      <div class="section-intro"><h2>クライアント候補</h2><p>サービスごとの優先度で確認できます。スプシでは「サービス候補」シートに1サービス1行で保存されます。</p></div>
       <div class="toolbar"><div class="segmented" id="prioritySegment"><button class="active" data-priority="">すべて</button><button data-priority="high">高</button><button data-priority="medium">中</button><button data-priority="low">低</button></div><select id="serviceFilter"><option value="">すべてのサービス</option></select></div>
       <div id="prospectGrid" class="prospect-grid"></div>
     </section>
 
     <section class="view" id="actionsView">
-      <div class="section-intro"><h2>次回アクション</h2><p>次に誰へ何をするかを一か所で確認します。</p></div>
+      <div class="section-intro"><h2>次回アクション</h2><p>次に誰へ何をするかを一か所で確認します。完了状態もスプレッドシートへ同期されます。</p></div>
       <div class="toolbar"><div class="segmented" id="actionSegment"><button class="active" data-action-filter="open">未完了</button><button data-action-filter="all">すべて</button><button data-action-filter="done">完了</button></div></div>
       <article class="panel"><div class="panel-head compact"><div><p class="eyebrow">FOLLOW UP</p><h3>アクション一覧</h3></div><span class="count-label" id="actionsCountLabel">0件</span></div><div id="actionsList" class="action-list"></div></article>
     </section>
@@ -73,6 +79,34 @@
         <div class="network-map-wrap" id="networkMapWrap"><div id="networkMapEmpty" class="empty-state hidden">人物を登録するとマップが表示されます。</div><svg id="networkMapSvg" class="network-map" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid meet"></svg></div>
         <div class="network-help"><span>人物クリック：選択</span><span>ホイール：拡大縮小</span><span>余白ドラッグ：移動</span></div>
       </article>
+    </section>
+
+    <section class="view" id="settingsView">
+      <div class="section-intro"><h2>Googleスプレッドシート連携</h2><p>GAS WebアプリのURLと接続キーを一度設定すると、このブラウザに保存されます。</p></div>
+      <div class="settings-grid">
+        <article class="panel settings-panel">
+          <div class="panel-head"><div><p class="eyebrow">CONNECTION</p><h3>GAS接続設定</h3></div><span id="settingsConnectionBadge" class="connection-badge offline">未接続</span></div>
+          <label class="settings-field"><span>GAS WebアプリURL</span><input id="gasUrlInput" placeholder="https://script.google.com/macros/s/.../exec" /></label>
+          <label class="settings-field"><span>接続キー</span><input id="gasKeyInput" type="password" placeholder="スプシ「設定」シートの接続キー" /></label>
+          <div class="settings-actions"><button class="primary-btn" id="saveConnectionBtn">設定を保存・接続確認</button><button class="secondary-btn" id="clearConnectionBtn">接続を解除</button></div>
+          <div id="connectionMessage" class="connection-message"></div>
+        </article>
+        <article class="panel settings-panel">
+          <div class="panel-head"><div><p class="eyebrow">SYNC</p><h3>データ同期</h3></div></div>
+          <div class="sync-action-card"><div><strong>スプシ → この画面</strong><p>Googleスプレッドシートを正として最新データを再取得します。</p></div><button class="secondary-btn" id="pullFromGasBtn">再読込</button></div>
+          <div class="sync-action-card warning"><div><strong>この画面 → スプシ</strong><p>現在ブラウザにある全データでスプレッドシートを置き換えます。初回移行用です。</p></div><button class="danger-outline-btn" id="pushToGasBtn">全データを反映</button></div>
+        </article>
+        <article class="panel settings-panel full-width">
+          <div class="panel-head"><div><p class="eyebrow">SHEET STRUCTURE</p><h3>使用する5シート</h3></div></div>
+          <div class="sheet-structure">
+            <div><strong>人物マスタ</strong><span>人物ID・氏名・接点・優先度・メモ</span></div>
+            <div><strong>紹介関係</strong><span>紹介元ID → 紹介先ID・関係メモ</span></div>
+            <div><strong>サービス候補</strong><span>人物ごとのサービス名・優先度</span></div>
+            <div><strong>次回アクション</strong><span>日付・内容・完了状態</span></div>
+            <div><strong>設定</strong><span>スキーマVersion・接続キーなど</span></div>
+          </div>
+        </article>
+      </div>
     </section>
   </div></main>
 </div>
