@@ -4,376 +4,94 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f7f8f5" />
-  <title>Connect CRM v004</title>
+  <title>Connect CRM v005</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="sidebar">
-      <div>
-        <div class="brand">
-          <div class="brand-mark">C</div>
-          <div class="brand-copy">
-            <strong>Connect CRM</strong>
-            <span>Personal relationship CRM</span>
-          </div>
-        </div>
-
-        <nav class="nav" aria-label="メインメニュー">
-          <button class="nav-item active" data-view="dashboard">
-            <span class="nav-icon">⌂</span><span>ホーム</span>
-          </button>
-          <button class="nav-item" data-view="contacts">
-            <span class="nav-icon">◎</span><span>つながり</span>
-          </button>
-          <button class="nav-item" data-view="prospects">
-            <span class="nav-icon">↗</span><span>クライアント候補</span>
-          </button>
-          <button class="nav-item" data-view="actions">
-            <span class="nav-icon">✓</span><span>次回アクション</span>
-          </button>
-          <button class="nav-item" data-view="network">
-            <span class="nav-icon">◌</span><span>関係マップ</span>
-          </button>
-        </nav>
-      </div>
-
-      <div class="sidebar-footer">
-        <div class="account-card">
-          <div class="avatar">事</div>
-          <div>
-            <strong>事業主アカウント</strong>
-            <span>1ユーザー利用</span>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <main class="main">
-      <div class="page-container">
-        <header class="topbar">
-          <div>
-            <p class="eyebrow">PERSONAL CRM</p>
-            <h1 id="pageTitle">ホーム</h1>
-          </div>
-          <button class="primary-btn" id="addContactBtn">＋ 人を追加</button>
-        </header>
-
-        <section class="view active" id="dashboardView">
-          <section class="intro-card">
-            <div>
-              <p class="eyebrow">RELATIONSHIP FIRST</p>
-              <h2>人とのつながりを、次の仕事につなげる。</h2>
-              <p>「誰と・どこで・誰の紹介でつながったか」と「どのサービスにつながりそうか」を、一人ずつ整理して管理します。</p>
-            </div>
-          </section>
-
-          <section class="summary-section">
-            <div class="section-title-row">
-              <div>
-                <p class="eyebrow">OVERVIEW</p>
-                <h2 class="section-title">いまの状況</h2>
-              </div>
-            </div>
-
-            <div class="metrics-grid">
-              <article class="metric-card">
-                <span class="metric-label">登録人数</span>
-                <strong id="metricContacts">0</strong>
-                <small>つながりを記録中</small>
-              </article>
-              <article class="metric-card">
-                <span class="metric-label">高優先度候補</span>
-                <strong id="metricHigh">0</strong>
-                <small>サービス単位の候補数</small>
-              </article>
-              <article class="metric-card">
-                <span class="metric-label">次回アクション</span>
-                <strong id="metricActions">0</strong>
-                <small>未完了の予定</small>
-              </article>
-              <article class="metric-card">
-                <span class="metric-label">紹介経由</span>
-                <strong id="metricIntroduced">0</strong>
-                <small>紹介元ありの人物</small>
-              </article>
-            </div>
-          </section>
-
-          <section class="dashboard-columns">
-            <article class="panel priority-panel">
-              <div class="panel-head">
-                <div>
-                  <p class="eyebrow">NEXT ACTION</p>
-                  <h3>次にやること</h3>
-                  <p class="panel-subtitle">直近のフォロー予定を優先して表示します。</p>
-                </div>
-                <button class="text-btn" data-jump="actions">すべて見る</button>
-              </div>
-              <div id="upcomingActions" class="stack-list"></div>
-            </article>
-
-            <article class="panel">
-              <div class="panel-head">
-                <div>
-                  <p class="eyebrow">HIGH PRIORITY</p>
-                  <h3>優先クライアント候補</h3>
-                  <p class="panel-subtitle">「高」に設定したサービス候補です。</p>
-                </div>
-                <button class="text-btn" data-jump="prospects">すべて見る</button>
-              </div>
-              <div id="highPriorityList" class="stack-list"></div>
-            </article>
-          </section>
-
-          <article class="panel">
-            <div class="panel-head">
-              <div>
-                <p class="eyebrow">RECENT CONNECTIONS</p>
-                <h3>最近つながった人</h3>
-                <p class="panel-subtitle">新しい接点から関係を育てていきます。</p>
-              </div>
-              <button class="text-btn" data-jump="contacts">一覧を見る</button>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>名前</th>
-                    <th>出会いのきっかけ</th>
-                    <th>紹介元</th>
-                    <th>最終接点</th>
-                    <th>次回アクション</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody id="recentContactsTable"></tbody>
-              </table>
-            </div>
-          </article>
-        </section>
-
-        <section class="view" id="contactsView">
-          <div class="section-intro">
-            <div>
-              <h2>つながり一覧</h2>
-              <p>人との関係、紹介経路、サービス候補をまとめて確認できます。</p>
-            </div>
-          </div>
-
-          <div class="toolbar">
-            <div class="search-box">
-              <span>⌕</span>
-              <input id="contactSearch" type="search" placeholder="名前・きっかけ・紹介元で検索" />
-            </div>
-            <select id="sourceFilter">
-              <option value="">すべての出会い</option>
-            </select>
-          </div>
-
-          <article class="panel">
-            <div class="panel-head compact">
-              <div>
-                <p class="eyebrow">CONNECTIONS</p>
-                <h3>人物一覧</h3>
-              </div>
-              <span class="count-label" id="contactsCountLabel">0人</span>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>人物</th>
-                    <th>出会いのきっかけ</th>
-                    <th>紹介元</th>
-                    <th>サービス候補</th>
-                    <th>次回アクション</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody id="contactsTable"></tbody>
-              </table>
-            </div>
-          </article>
-        </section>
-
-        <section class="view" id="prospectsView">
-          <div class="section-intro">
-            <div>
-              <h2>クライアント候補</h2>
-              <p>人物ではなく「サービスごとの可能性」で優先順位を確認できます。</p>
-            </div>
-          </div>
-
-          <div class="toolbar">
-            <div class="segmented" id="prioritySegment">
-              <button class="active" data-priority="">すべて</button>
-              <button data-priority="high">高</button>
-              <button data-priority="medium">中</button>
-              <button data-priority="low">低</button>
-            </div>
-            <select id="serviceFilter">
-              <option value="">すべてのサービス</option>
-            </select>
-          </div>
-          <div id="prospectGrid" class="prospect-grid"></div>
-        </section>
-
-        <section class="view" id="actionsView">
-          <div class="section-intro">
-            <div>
-              <h2>次回アクション</h2>
-              <p>「次に誰へ何をするか」を一か所で確認します。</p>
-            </div>
-          </div>
-
-          <div class="toolbar">
-            <div class="segmented" id="actionSegment">
-              <button class="active" data-action-filter="open">未完了</button>
-              <button data-action-filter="all">すべて</button>
-              <button data-action-filter="done">完了</button>
-            </div>
-          </div>
-
-          <article class="panel">
-            <div class="panel-head compact">
-              <div>
-                <p class="eyebrow">FOLLOW UP</p>
-                <h3>アクション一覧</h3>
-              </div>
-              <span class="count-label" id="actionsCountLabel">0件</span>
-            </div>
-            <div id="actionsList" class="action-list"></div>
-          </article>
-        </section>
-
-        <section class="view" id="networkView">
-          <div class="section-intro">
-            <div>
-              <h2>関係マップ</h2>
-              <p>人物を指定すると、その人の紹介元と紹介先のつながりをマインドマップ風に確認できます。</p>
-            </div>
-          </div>
-
-          <article class="panel">
-            <div class="network-toolbar">
-              <div class="network-selector-wrap">
-                <label for="networkContactSelect">表示する人物</label>
-                <select id="networkContactSelect"></select>
-              </div>
-              <div class="network-stats" id="networkStats"></div>
-            </div>
-            <div class="network-direction-guide">
-              <strong>矢印の向き</strong>
-              <span>紹介元人物</span><span class="direction-arrow">→</span><span>紹介先人物</span>
-            </div>
-            <div class="network-map-wrap" id="networkMapWrap">
-              <div class="network-map-controls" aria-label="関係マップの拡大縮小">
-                <button type="button" id="networkZoomOut" title="縮小">−</button>
-                <button type="button" id="networkFit" title="全体表示">全体</button>
-                <button type="button" id="networkZoomIn" title="拡大">＋</button>
-              </div>
-              <div id="networkMapEmpty" class="empty-state hidden">人物が登録されると、ここに関係マップが表示されます。</div>
-              <svg id="networkMapSvg" class="network-map" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet" aria-label="人物関係マップ"></svg>
-            </div>
-            <div class="network-help">
-              <span><span class="legend-dot legend-center"></span>選択中の人物</span>
-              <span><span class="legend-dot legend-root"></span>ネットワークの起点</span>
-              <span><span class="legend-line"></span>矢印方向に紹介</span>
-              <span>人物をクリックすると、その人物を選択できます。</span>
-            </div>
-          </article>
-        </section>
-      </div>
-    </main>
-  </div>
-
-  <dialog id="contactDialog" class="contact-dialog">
-    <form method="dialog" id="contactForm">
-      <div class="dialog-head">
-        <div>
-          <p class="eyebrow">CONTACT</p>
-          <h2 id="dialogTitle">人を追加</h2>
-        </div>
-        <button class="icon-btn" value="cancel" type="button" id="closeDialogBtn">×</button>
-      </div>
-
-      <input type="hidden" id="contactId" />
-
-      <div class="form-section">
-        <h3>基本情報</h3>
-        <div class="form-grid">
-          <label>
-            <span>名前 *</span>
-            <input id="nameInput" required placeholder="例：山田 太郎" />
-          </label>
-          <label>
-            <span>出会った日</span>
-            <input id="metDateInput" type="date" />
-          </label>
-          <label>
-            <span>出会いのきっかけ</span>
-            <input id="sourceInput" placeholder="例：交流会、紹介、SNS" />
-          </label>
-          <label>
-            <span>紹介元</span>
-            <input id="referrerInput" placeholder="例：佐藤さん" list="contactNames" />
-            <datalist id="contactNames"></datalist>
-          </label>
-        </div>
-
-        <label>
-          <span>人物メモ</span>
-          <textarea id="noteInput" rows="3" placeholder="どんな人か、話した内容、関係性など"></textarea>
-        </label>
-      </div>
-
-      <div class="form-section">
-        <div class="section-head-inline">
-          <div>
-            <h3>サービス候補</h3>
-            <p>サービスごとにクライアント候補優先度を設定できます。</p>
-          </div>
-          <button type="button" class="secondary-btn" id="addServiceRowBtn">＋ サービス追加</button>
-        </div>
-        <div id="serviceRows" class="service-rows"></div>
-      </div>
-
-      <div class="form-section">
-        <h3>次回アクション</h3>
-        <div class="form-grid">
-          <label>
-            <span>日付</span>
-            <input id="nextActionDateInput" type="date" />
-          </label>
-          <label>
-            <span>アクション</span>
-            <input id="nextActionInput" placeholder="例：LINEする、見積を送る" />
-          </label>
-        </div>
-      </div>
-
-      <div class="dialog-actions">
-        <button class="danger-btn hidden" type="button" id="deleteContactBtn">削除</button>
-        <div class="spacer"></div>
-        <button class="secondary-btn" type="button" id="cancelDialogBtn">キャンセル</button>
-        <button class="primary-btn" type="submit">保存</button>
-      </div>
-    </form>
-  </dialog>
-
-  <template id="serviceRowTemplate">
-    <div class="service-row">
-      <input class="service-name" placeholder="サービス名" />
-      <select class="service-priority">
-        <option value="high">高</option>
-        <option value="medium" selected>中</option>
-        <option value="low">低</option>
-      </select>
-      <button type="button" class="icon-btn remove-service-btn">×</button>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div>
+      <div class="brand"><div class="brand-mark">C</div><div class="brand-copy"><strong>Connect CRM</strong><span>Relationship-first CRM</span></div></div>
+      <nav class="nav">
+        <button class="nav-item active" data-view="dashboard"><span class="nav-icon">⌂</span><span>ホーム</span></button>
+        <button class="nav-item" data-view="contacts"><span class="nav-icon">◎</span><span>人物</span></button>
+        <button class="nav-item" data-view="relationships"><span class="nav-icon">⇢</span><span>紹介関係</span></button>
+        <button class="nav-item" data-view="prospects"><span class="nav-icon">↗</span><span>候補</span></button>
+        <button class="nav-item" data-view="actions"><span class="nav-icon">✓</span><span>アクション</span></button>
+        <button class="nav-item" data-view="network"><span class="nav-icon">◌</span><span>関係マップ</span></button>
+      </nav>
     </div>
-  </template>
+    <div class="sidebar-footer"><div class="account-card"><div class="avatar">事</div><div><strong>事業主アカウント</strong><span>1ユーザー利用</span></div></div></div>
+  </aside>
 
-  <script src="./app.js"></script>
-</body>
-</html>
+  <main class="main"><div class="page-container">
+    <header class="topbar"><div><p class="eyebrow">PERSONAL CRM</p><h1 id="pageTitle">ホーム</h1></div><button class="primary-btn" id="addContactBtn">＋ 人物を追加</button></header>
+
+    <section class="view active" id="dashboardView">
+      <section class="intro-card"><p class="eyebrow">RELATIONSHIP FIRST</p><h2>紹介の流れまで見える顧客管理。</h2><p>人物情報と紹介関係を分けて管理し、1人に複数の紹介元・紹介先があるネットワークもそのまま可視化します。</p></section>
+      <div class="metrics-grid">
+        <article class="metric-card"><span>登録人物</span><strong id="metricContacts">0</strong><small>人物マスタ</small></article>
+        <article class="metric-card"><span>紹介関係</span><strong id="metricRelations">0</strong><small>紹介元 → 紹介先</small></article>
+        <article class="metric-card"><span>高優先度候補</span><strong id="metricHigh">0</strong><small>サービス単位</small></article>
+        <article class="metric-card"><span>次回アクション</span><strong id="metricActions">0</strong><small>未完了</small></article>
+      </div>
+      <div class="dashboard-columns">
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">NEXT ACTION</p><h3>次にやること</h3></div><button class="text-btn" data-jump="actions">すべて見る</button></div><div id="upcomingActions" class="stack-list"></div></article>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">NETWORK HUB</p><h3>紹介が広がっている人</h3></div><button class="text-btn" data-jump="network">マップを見る</button></div><div id="hubList" class="stack-list"></div></article>
+      </div>
+      <article class="panel"><div class="panel-head"><div><p class="eyebrow">RECENT CONNECTIONS</p><h3>人物一覧プレビュー</h3></div><button class="text-btn" data-jump="contacts">一覧を見る</button></div><div class="table-wrap"><table><thead><tr><th>人物</th><th>出会い</th><th>紹介元</th><th>紹介先</th><th>優先度</th><th>次回アクション</th><th></th></tr></thead><tbody id="recentContactsTable"></tbody></table></div></article>
+    </section>
+
+    <section class="view" id="contactsView">
+      <div class="section-intro"><h2>人物マスタ</h2><p>人物そのものの情報を管理します。紹介関係は別テーブルで管理するため、複数の紹介元にも対応できます。</p></div>
+      <div class="toolbar"><div class="search-box"><span>⌕</span><input id="contactSearch" type="search" placeholder="名前・きっかけ・サービスで検索" /></div><select id="sourceFilter"><option value="">すべての出会い</option></select></div>
+      <article class="panel"><div class="panel-head compact"><div><p class="eyebrow">PEOPLE</p><h3>人物一覧</h3></div><span class="count-label" id="contactsCountLabel">0人</span></div><div class="table-wrap"><table><thead><tr><th>人物</th><th>出会い</th><th>紹介元</th><th>紹介先</th><th>サービス候補</th><th>次回アクション</th><th></th></tr></thead><tbody id="contactsTable"></tbody></table></div></article>
+    </section>
+
+    <section class="view" id="relationshipsView">
+      <div class="section-intro"><h2>紹介関係</h2><p><strong>紹介元 → 紹介先</strong> を1行1関係で管理します。同じ人物に複数の紹介元を登録できます。</p></div>
+      <div class="toolbar"><div class="search-box"><span>⌕</span><input id="relationshipSearch" type="search" placeholder="紹介元・紹介先・メモで検索" /></div><button class="primary-btn" id="addRelationshipBtn">＋ 紹介関係を追加</button></div>
+      <article class="panel"><div class="panel-head compact"><div><p class="eyebrow">REFERRALS</p><h3>紹介元 → 紹介先</h3></div><span class="count-label" id="relationshipsCountLabel">0件</span></div><div class="table-wrap"><table><thead><tr><th>紹介元</th><th class="arrow-col">→</th><th>紹介先</th><th>メモ</th><th>登録日</th><th></th></tr></thead><tbody id="relationshipsTable"></tbody></table></div></article>
+    </section>
+
+    <section class="view" id="prospectsView">
+      <div class="section-intro"><h2>クライアント候補</h2><p>サービスごとに優先度「高・中・低」で確認できます。</p></div>
+      <div class="toolbar"><div class="segmented" id="prioritySegment"><button class="active" data-priority="">すべて</button><button data-priority="high">高</button><button data-priority="medium">中</button><button data-priority="low">低</button></div><select id="serviceFilter"><option value="">すべてのサービス</option></select></div>
+      <div id="prospectGrid" class="prospect-grid"></div>
+    </section>
+
+    <section class="view" id="actionsView">
+      <div class="section-intro"><h2>次回アクション</h2><p>次に誰へ何をするかを一か所で確認します。</p></div>
+      <div class="toolbar"><div class="segmented" id="actionSegment"><button class="active" data-action-filter="open">未完了</button><button data-action-filter="all">すべて</button><button data-action-filter="done">完了</button></div></div>
+      <article class="panel"><div class="panel-head compact"><div><p class="eyebrow">FOLLOW UP</p><h3>アクション一覧</h3></div><span class="count-label" id="actionsCountLabel">0件</span></div><div id="actionsList" class="action-list"></div></article>
+    </section>
+
+    <section class="view" id="networkView">
+      <div class="section-intro"><h2>関係マップ</h2><p>矢印は必ず <strong>紹介元 → 紹介先</strong>。複数紹介元がある人物には複数方向から矢印が入ります。</p></div>
+      <article class="panel">
+        <div class="network-toolbar"><div class="network-selector-wrap"><label>人物を指定</label><select id="networkContactSelect"></select></div><div class="network-stats" id="networkStats"></div><div class="zoom-controls"><button id="networkZoomOut">−</button><button id="networkFit">全体</button><button id="networkZoomIn">＋</button></div></div>
+        <div class="network-map-wrap" id="networkMapWrap"><div id="networkMapEmpty" class="empty-state hidden">人物を登録するとマップが表示されます。</div><svg id="networkMapSvg" class="network-map" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid meet"></svg></div>
+        <div class="network-help"><span>人物クリック：選択</span><span>ホイール：拡大縮小</span><span>余白ドラッグ：移動</span></div>
+      </article>
+    </section>
+  </div></main>
+</div>
+
+<dialog id="contactDialog" class="contact-dialog"><form method="dialog" id="contactForm">
+  <div class="dialog-head"><div><p class="eyebrow">PERSON</p><h2 id="dialogTitle">人物を追加</h2></div><button class="icon-btn" type="button" id="closeDialogBtn">×</button></div>
+  <input type="hidden" id="contactId" />
+  <div class="form-section"><h3>基本情報</h3><div class="form-grid"><label><span>名前 *</span><input id="nameInput" required /></label><label><span>初回接点日</span><input id="metDateInput" type="date" /></label><label><span>出会いのきっかけ</span><input id="sourceInput" placeholder="交流会、紹介、SNSなど" /></label><label><span>総合優先度</span><select id="overallPriorityInput"><option value="high">高</option><option value="medium" selected>中</option><option value="low">低</option></select></label></div><label><span>人物メモ</span><textarea id="noteInput" rows="3"></textarea></label><p class="form-hint">紹介元・紹介先は「紹介関係」画面で登録します。</p></div>
+  <div class="form-section"><div class="section-head-inline"><div><h3>サービス候補</h3><p>人物ごとに複数サービスを登録できます。</p></div><button type="button" class="secondary-btn" id="addServiceRowBtn">＋ サービス追加</button></div><div id="serviceRows" class="service-rows"></div></div>
+  <div class="form-section"><h3>次回アクション</h3><div class="form-grid"><label><span>日付</span><input id="nextActionDateInput" type="date" /></label><label><span>アクション</span><input id="nextActionInput" /></label></div></div>
+  <div class="dialog-actions"><button class="danger-btn hidden" type="button" id="deleteContactBtn">削除</button><div class="spacer"></div><button class="secondary-btn" type="button" id="cancelDialogBtn">キャンセル</button><button class="primary-btn" type="submit">保存</button></div>
+</form></dialog>
+
+<dialog id="relationshipDialog" class="contact-dialog small-dialog"><form method="dialog" id="relationshipForm">
+  <div class="dialog-head"><div><p class="eyebrow">REFERRAL</p><h2>紹介関係を追加</h2></div><button class="icon-btn" type="button" id="closeRelationshipDialogBtn">×</button></div>
+  <div class="form-section no-top"><div class="relationship-form-grid"><label><span>紹介元 *</span><select id="relationFromInput" required></select></label><div class="big-arrow">→</div><label><span>紹介先 *</span><select id="relationToInput" required></select></label></div><label><span>関係メモ</span><textarea id="relationMemoInput" rows="3" placeholder="どのような経緯で紹介されたか"></textarea></label></div>
+  <div class="dialog-actions"><div class="spacer"></div><button class="secondary-btn" type="button" id="cancelRelationshipDialogBtn">キャンセル</button><button class="primary-btn" type="submit">追加</button></div>
+</form></dialog>
+
+<template id="serviceRowTemplate"><div class="service-row"><input class="service-name" placeholder="サービス名" /><select class="service-priority"><option value="high">高</option><option value="medium" selected>中</option><option value="low">低</option></select><button type="button" class="icon-btn remove-service-btn">×</button></div></template>
+<script src="./app.js"></script>
+</body></html>
