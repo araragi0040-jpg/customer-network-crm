@@ -645,7 +645,7 @@ tbody tr.clickable:hover { background: #fbfcfa; }
   justify-content: space-between;
   align-items: end;
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   flex-wrap: wrap;
 }
 
@@ -666,18 +666,92 @@ tbody tr.clickable:hover { background: #fbfcfa; }
   flex-wrap: wrap;
 }
 
+.network-direction-guide {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 2px 0 12px;
+  padding: 8px 11px;
+  border-radius: 10px;
+  background: #f5f8f5;
+  color: #56605a;
+  font-size: 11px;
+}
+
+.network-direction-guide strong {
+  color: var(--text);
+}
+
+.direction-arrow {
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
 .network-map-wrap {
+  position: relative;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: linear-gradient(180deg, #fdfefd 0%, #f7faf7 100%);
-  padding: 12px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(30, 91, 67, .035), transparent 28%),
+    linear-gradient(180deg, #fdfefd 0%, #f7faf7 100%);
+  padding: 8px;
   overflow: hidden;
+  touch-action: none;
+}
+
+.network-map-controls {
+  position: absolute;
+  z-index: 5;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255,255,255,.94);
+  box-shadow: 0 6px 18px rgba(31,39,33,.08);
+}
+
+.network-map-controls button {
+  min-width: 34px;
+  height: 32px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #4d5750;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.network-map-controls button:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .network-map {
   display: block;
   width: 100%;
-  min-height: 520px;
+  height: min(68vh, 720px);
+  min-height: 560px;
+  cursor: grab;
+  user-select: none;
+}
+
+.network-map.dragging {
+  cursor: grabbing;
+}
+
+.network-svg-node {
+  cursor: pointer;
+}
+
+.network-svg-node:hover rect {
+  filter: brightness(.985);
+  stroke-width: 3;
 }
 
 .network-help {
@@ -698,8 +772,16 @@ tbody tr.clickable:hover { background: #fbfcfa; }
 }
 
 .legend-center { background: var(--accent); }
-.legend-parent { background: var(--parent); }
-.legend-child { background: var(--child); }
+.legend-root { background: #ffffff; border: 2px solid #74847a; }
+
+.legend-line {
+  width: 20px;
+  height: 0;
+  display: inline-block;
+  margin-right: 6px;
+  border-top: 2px solid #78877f;
+  vertical-align: middle;
+}
 
 .empty-state {
   padding: 26px 12px;

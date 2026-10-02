@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f7f8f5" />
-  <title>Connect CRM v003</title>
+  <title>Connect CRM v004</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
@@ -263,14 +263,24 @@
               </div>
               <div class="network-stats" id="networkStats"></div>
             </div>
-            <div class="network-map-wrap">
+            <div class="network-direction-guide">
+              <strong>矢印の向き</strong>
+              <span>紹介元人物</span><span class="direction-arrow">→</span><span>紹介先人物</span>
+            </div>
+            <div class="network-map-wrap" id="networkMapWrap">
+              <div class="network-map-controls" aria-label="関係マップの拡大縮小">
+                <button type="button" id="networkZoomOut" title="縮小">−</button>
+                <button type="button" id="networkFit" title="全体表示">全体</button>
+                <button type="button" id="networkZoomIn" title="拡大">＋</button>
+              </div>
               <div id="networkMapEmpty" class="empty-state hidden">人物が登録されると、ここに関係マップが表示されます。</div>
-              <svg id="networkMapSvg" class="network-map" viewBox="0 0 1000 540" preserveAspectRatio="xMidYMid meet" aria-label="人物関係マップ"></svg>
+              <svg id="networkMapSvg" class="network-map" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet" aria-label="人物関係マップ"></svg>
             </div>
             <div class="network-help">
               <span><span class="legend-dot legend-center"></span>選択中の人物</span>
-              <span><span class="legend-dot legend-parent"></span>紹介元の流れ</span>
-              <span><span class="legend-dot legend-child"></span>紹介先の流れ</span>
+              <span><span class="legend-dot legend-root"></span>ネットワークの起点</span>
+              <span><span class="legend-line"></span>矢印方向に紹介</span>
+              <span>人物をクリックすると、その人物を選択できます。</span>
             </div>
           </article>
         </section>

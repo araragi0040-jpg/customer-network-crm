@@ -81,6 +81,9 @@ let state = loadState();
 let currentPriorityFilter = "";
 let currentActionFilter = "open";
 let selectedNetworkContactId = state.contacts[0]?.id || "";
+let networkBaseViewBox = { x: 0, y: 0, w: 1000, h: 620 };
+let networkCurrentViewBox = { ...networkBaseViewBox };
+let networkDragState = null;
 
 const els = {
   pageTitle: document.querySelector("#pageTitle"),
@@ -113,7 +116,11 @@ const els = {
   networkContactSelect: document.querySelector("#networkContactSelect"),
   networkStats: document.querySelector("#networkStats"),
   networkMapSvg: document.querySelector("#networkMapSvg"),
-  networkMapEmpty: document.querySelector("#networkMapEmpty")
+  networkMapWrap: document.querySelector("#networkMapWrap"),
+  networkMapEmpty: document.querySelector("#networkMapEmpty"),
+  networkZoomIn: document.querySelector("#networkZoomIn"),
+  networkZoomOut: document.querySelector("#networkZoomOut"),
+  networkFit: document.querySelector("#networkFit")
 };
 
 function loadState() {
@@ -179,9 +186,9 @@ function countDescendants(contact, visited = new Set()) {
   return children.reduce((sum, child) => sum + 1 + countDescendants(child, new Set(visited)), 0);
 }
 
-function ancestorChain(contact, maxDepth = 5) {
+function ancestorChain(contact, maxDepth = 12) {
   const chain = [];
-  const visited = new Set();
+  const visited = new Set([contact?.id].filter(Boolean));
   let current = contact;
   let depth = 0;
   while (current?.referrer && depth < maxDepth) {
@@ -195,17 +202,33 @@ function ancestorChain(contact, maxDepth = 5) {
   return chain;
 }
 
-function buildReferralTree(contact, visited = new Set(), depth = 0, maxDepth = 4) {
-  if (!contact || visited.has(contact.id) || depth > maxDepth) {
-    return null;
+function referralRoot(contact) {
+  if (!contact) return null;
+  const visited = new Set([contact.id]);
+  let current = contact;
+  while (current?.referrer) {
+    const parent = contactByName(current.referrer);
+    if (!parent || visited.has(parent.id)) break;
+    visited.add(parent.id);
+    current = parent;
   }
+  return current;
+}
+
+function buildReferralTree(contact, visited = new Set(), depth = 0, maxDepth = 8) {
+  if (!contact || visited.has(contact.id) || depth > maxDepth) return null;
   const nextVisited = new Set(visited);
   nextVisited.add(contact.id);
   const children = directChildrenOf(contact)
     .filter(child => !nextVisited.has(child.id))
     .map(child => buildReferralTree(child, nextVisited, depth + 1, maxDepth))
     .filter(Boolean);
-  return { contact, children };
+  return { contact, children, depth };
+}
+
+function treeSize(tree) {
+  if (!tree) return 0;
+  return 1 + tree.children.reduce((sum, child) => sum + treeSize(child), 0);
 }
 
 function leafCount(tree) {
@@ -214,23 +237,100 @@ function leafCount(tree) {
   return tree.children.reduce((sum, child) => sum + leafCount(child), 0);
 }
 
-function layoutTree(tree, xStart, yStart, yEnd, xStep, level = 0, positions = []) {
-  if (!tree) return positions;
-  const y = (yStart + yEnd) / 2;
-  const x = xStart + level * xStep;
-  positions.push({ id: tree.contact.id, contact: tree.contact, x, y, type: level === 0 ? "center" : "child" });
+function depthCounts(tree, counts = [], depth = 0) {
+  if (!tree) return counts;
+  counts[depth] = (counts[depth] || 0) + 1;
+  tree.children.forEach(child => depthCounts(child, counts, depth + 1));
+  return counts;
+}
 
-  if (!tree.children.length) return positions;
+function layoutRadialTree(tree, hasExternalParent = false) {
+  if (!tree) return [];
+  const counts = depthCounts(tree);
+  const radii = [0];
+  for (let depth = 1; depth < counts.length; depth += 1) {
+    const circumferenceRadius = ((counts[depth] || 1) * 195) / (Math.PI * 2) + 55;
+    radii[depth] = Math.max((radii[depth - 1] || 0) + 245, circumferenceRadius);
+  }
 
-  const totalLeaves = tree.children.reduce((sum, child) => sum + leafCount(child), 0);
-  let cursor = yStart;
-  tree.children.forEach(child => {
-    const childLeaves = leafCount(child);
-    const slice = ((yEnd - yStart) * childLeaves) / totalLeaves;
-    layoutTree(child, xStart, cursor, cursor + slice, xStep, level + 1, positions);
-    cursor += slice;
-  });
+  const positions = [{
+    id: tree.contact.id,
+    contact: tree.contact,
+    x: 0,
+    y: 0,
+    depth: 0,
+    parentId: null
+  }];
+
+  function placeChildren(node, parentAngle, startAngle, endAngle, depth) {
+    if (!node.children.length) return;
+    const totalWeight = node.children.reduce((sum, child) => sum + leafCount(child), 0);
+    let cursor = startAngle;
+
+    node.children.forEach((child, index) => {
+      const weight = leafCount(child);
+      const slice = (endAngle - startAngle) * (weight / totalWeight);
+      let angle = cursor + slice / 2;
+
+      // A single branch should continue outward, while multiple branches fan out.
+      if (node.children.length === 1 && Number.isFinite(parentAngle)) {
+        angle = parentAngle;
+      }
+
+      const radius = radii[depth] || depth * 245;
+      positions.push({
+        id: child.contact.id,
+        contact: child.contact,
+        x: Math.cos(angle) * radius,
+        y: Math.sin(angle) * radius,
+        depth,
+        angle,
+        parentId: node.contact.id
+      });
+
+      const maxHalfSpan = depth === 1 ? 1.22 : 0.95;
+      const naturalHalf = Math.max(0.32, slice * 0.46);
+      const halfSpan = Math.min(maxHalfSpan, naturalHalf);
+      placeChildren(child, angle, angle - halfSpan, angle + halfSpan, depth + 1);
+      cursor += slice;
+    });
+  }
+
+  // If an unregistered introducer exists, keep some space on the left side for it.
+  const start = hasExternalParent ? -2.42 : -Math.PI;
+  const end = hasExternalParent ? 2.42 : Math.PI;
+  placeChildren(tree, 0, start, end, 1);
   return positions;
+}
+
+function applyNetworkViewBox() {
+  if (!els.networkMapSvg) return;
+  const v = networkCurrentViewBox;
+  els.networkMapSvg.setAttribute("viewBox", `${v.x} ${v.y} ${v.w} ${v.h}`);
+}
+
+function fitNetworkMap() {
+  networkCurrentViewBox = { ...networkBaseViewBox };
+  applyNetworkViewBox();
+}
+
+function zoomNetworkMap(multiplier) {
+  const current = networkCurrentViewBox;
+  const base = networkBaseViewBox;
+  const minW = Math.max(260, base.w * 0.18);
+  const maxW = base.w * 3.2;
+  const nextW = Math.min(maxW, Math.max(minW, current.w * multiplier));
+  const ratio = nextW / current.w;
+  const nextH = current.h * ratio;
+  const cx = current.x + current.w / 2;
+  const cy = current.y + current.h / 2;
+  networkCurrentViewBox = {
+    x: cx - nextW / 2,
+    y: cy - nextH / 2,
+    w: nextW,
+    h: nextH
+  };
+  applyNetworkViewBox();
 }
 
 function switchView(viewName) {
@@ -497,171 +597,228 @@ function renderNetworkView() {
   const parentChain = ancestorChain(focus);
   const directChildren = directChildrenOf(focus);
   const totalDescendants = countDescendants(focus);
+  const root = referralRoot(focus);
+  const tree = buildReferralTree(root);
+  const visibleCount = treeSize(tree);
+
   els.networkStats.innerHTML = `
-    <span class="stat-chip">紹介元チェーン: ${parentChain.length}人</span>
+    <span class="stat-chip">紹介元: ${focus.referrer ? safeText(focus.referrer) : "なし"}</span>
     <span class="stat-chip">直接の紹介先: ${directChildren.length}人</span>
     <span class="stat-chip">紹介先合計: ${totalDescendants}人</span>
+    <span class="stat-chip">表示ネットワーク: ${visibleCount}人</span>
   `;
 
-  drawNetworkMap(focus, parentChain);
+  drawNetworkMap(focus, root, tree, parentChain);
 }
 
-function drawNetworkMap(focus, parentChain) {
+function drawNetworkMap(focus, root, tree, parentChain) {
   const svg = els.networkMapSvg;
   const NS = "http://www.w3.org/2000/svg";
   svg.innerHTML = "";
 
-  const width = 1000;
-  const height = 540;
-  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-
-  const center = { x: 410, y: height / 2 };
-  const parentStep = parentChain.length > 2 ? 100 : 120;
-  const xChildStart = 610;
-  const xChildStep = 150;
-
-  const tree = buildReferralTree(focus) || { contact: focus, children: [] };
-  const positions = layoutTree(tree, xChildStart, 55, height - 55, xChildStep).filter(node => node.id !== focus.id);
+  const externalReferrer = root?.referrer && !contactByName(root.referrer) ? root.referrer : "";
+  const positions = layoutRadialTree(tree, Boolean(externalReferrer));
   const positionMap = Object.fromEntries(positions.map(pos => [pos.id, pos]));
 
-  const parentPositions = parentChain.map((contact, index) => ({
-    id: contact.id,
-    contact,
-    x: center.x - (parentChain.length - index) * parentStep,
-    y: center.y,
-    type: "parent"
-  }));
+  if (externalReferrer) {
+    positions.push({
+      id: "__external_referrer__",
+      contact: { id: "__external_referrer__", name: externalReferrer, source: "未登録の紹介元" },
+      x: -285,
+      y: 0,
+      depth: -1,
+      angle: Math.PI,
+      parentId: null,
+      external: true
+    });
+  }
 
-  const allNodeRects = [];
+  const defs = document.createElementNS(NS, "defs");
+  const marker = document.createElementNS(NS, "marker");
+  marker.setAttribute("id", "referralArrow");
+  marker.setAttribute("markerWidth", "10");
+  marker.setAttribute("markerHeight", "10");
+  marker.setAttribute("refX", "8");
+  marker.setAttribute("refY", "3.5");
+  marker.setAttribute("orient", "auto");
+  marker.setAttribute("markerUnits", "strokeWidth");
+  const markerPath = document.createElementNS(NS, "path");
+  markerPath.setAttribute("d", "M0,0 L0,7 L9,3.5 z");
+  markerPath.setAttribute("fill", "#74867b");
+  marker.appendChild(markerPath);
+  defs.appendChild(marker);
+  svg.appendChild(defs);
 
   function add(el) { svg.appendChild(el); }
 
-  function drawLine(x1, y1, x2, y2, color, dash = false) {
-    const path = document.createElementNS(NS, "path");
-    const midX = (x1 + x2) / 2;
-    path.setAttribute("d", `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`);
-    path.setAttribute("fill", "none");
-    path.setAttribute("stroke", color);
-    path.setAttribute("stroke-width", "2.5");
-    path.setAttribute("stroke-linecap", "round");
-    if (dash) path.setAttribute("stroke-dasharray", "5 5");
-    add(path);
+  function nodeHalfWidth(pos) {
+    if (pos.external) return 84;
+    if (pos.id === focus.id) return 92;
+    return 84;
   }
 
-  function makeNode(x, y, contact, role, note = "") {
+  function nodeHalfHeight(pos) {
+    if (pos.id === focus.id) return 38;
+    return 34;
+  }
+
+  function drawArrow(source, target, subtle = false) {
+    const dx = target.x - source.x;
+    const dy = target.y - source.y;
+    const distance = Math.hypot(dx, dy) || 1;
+    const ux = dx / distance;
+    const uy = dy / distance;
+    const sourcePad = Math.min(nodeHalfWidth(source), 46 + Math.abs(ux) * 38);
+    const targetPad = Math.min(nodeHalfWidth(target), 50 + Math.abs(ux) * 38);
+    const x1 = source.x + ux * sourcePad;
+    const y1 = source.y + uy * Math.min(nodeHalfHeight(source), sourcePad * .55);
+    const x2 = target.x - ux * targetPad;
+    const y2 = target.y - uy * Math.min(nodeHalfHeight(target), targetPad * .55);
+
+    const line = document.createElementNS(NS, "line");
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+    line.setAttribute("stroke", subtle ? "#9ba8a0" : "#74867b");
+    line.setAttribute("stroke-width", subtle ? "2" : "2.6");
+    line.setAttribute("stroke-linecap", "round");
+    line.setAttribute("marker-end", "url(#referralArrow)");
+    if (subtle) line.setAttribute("stroke-dasharray", "5 5");
+    add(line);
+  }
+
+  // Draw all referral arrows first so nodes sit cleanly above them.
+  positions.filter(pos => !pos.external && pos.parentId).forEach(pos => {
+    const parent = positionMap[pos.parentId];
+    if (parent) drawArrow(parent, pos);
+  });
+
+  if (externalReferrer && root) {
+    const external = positions.find(pos => pos.external);
+    const rootPos = positionMap[root.id];
+    if (external && rootPos) drawArrow(external, rootPos, true);
+  }
+
+  function makeNode(pos) {
+    const { contact } = pos;
+    const isSelected = contact.id === focus.id;
+    const isRoot = contact.id === root?.id;
+    const isExternal = Boolean(pos.external);
+    const childrenCount = isExternal ? 0 : directChildrenOf(contact).length;
+
     const g = document.createElementNS(NS, "g");
-    const isCenter = role === "center";
-    const w = isCenter ? 170 : 150;
-    const h = isCenter ? 72 : 62;
-    const rx = 18;
-    const colors = role === "center"
-      ? { fill: "#1e5b43", text: "#ffffff", meta: "#d8ebe2", stroke: "#1e5b43" }
-      : role === "parent"
-        ? { fill: "#edf5f0", text: "#27493c", meta: "#5c7267", stroke: "#d1e2d8" }
-        : { fill: "#fbf3e5", text: "#714918", meta: "#8d6b41", stroke: "#efdcb7" };
+    g.classList.add("network-svg-node");
+    if (!isExternal) {
+      g.dataset.contactId = contact.id;
+      g.addEventListener("click", event => {
+        event.stopPropagation();
+        selectedNetworkContactId = contact.id;
+        renderNetworkView();
+      });
+    }
+
+    const w = isSelected ? 184 : 168;
+    const h = isSelected ? 76 : 68;
+    const fill = isSelected ? "#1e5b43" : isExternal ? "#f1f3f0" : "#ffffff";
+    const stroke = isSelected ? "#1e5b43" : isRoot ? "#718278" : isExternal ? "#b6beb9" : "#d8ded8";
+    const strokeWidth = isSelected ? 0 : isRoot ? 2.5 : 1.5;
+    const textColor = isSelected ? "#ffffff" : "#263029";
+    const metaColor = isSelected ? "#d7e9df" : "#768078";
 
     const rect = document.createElementNS(NS, "rect");
-    rect.setAttribute("x", x - w / 2);
-    rect.setAttribute("y", y - h / 2);
+    rect.setAttribute("x", pos.x - w / 2);
+    rect.setAttribute("y", pos.y - h / 2);
     rect.setAttribute("width", w);
     rect.setAttribute("height", h);
-    rect.setAttribute("rx", rx);
-    rect.setAttribute("fill", colors.fill);
-    rect.setAttribute("stroke", colors.stroke);
-    rect.setAttribute("stroke-width", isCenter ? "0" : "1.5");
+    rect.setAttribute("rx", "18");
+    rect.setAttribute("fill", fill);
+    rect.setAttribute("stroke", stroke);
+    rect.setAttribute("stroke-width", strokeWidth);
+    if (isExternal) rect.setAttribute("stroke-dasharray", "5 4");
     g.appendChild(rect);
 
     const name = document.createElementNS(NS, "text");
-    name.setAttribute("x", x);
-    name.setAttribute("y", y - 4);
+    name.setAttribute("x", pos.x);
+    name.setAttribute("y", pos.y - 5);
     name.setAttribute("text-anchor", "middle");
-    name.setAttribute("font-size", isCenter ? "18" : "15");
+    name.setAttribute("font-size", isSelected ? "17" : "14");
     name.setAttribute("font-weight", "800");
-    name.setAttribute("fill", colors.text);
+    name.setAttribute("fill", textColor);
     name.textContent = contact.name;
     g.appendChild(name);
 
     const meta = document.createElementNS(NS, "text");
-    meta.setAttribute("x", x);
-    meta.setAttribute("y", y + 18);
+    meta.setAttribute("x", pos.x);
+    meta.setAttribute("y", pos.y + 17);
     meta.setAttribute("text-anchor", "middle");
-    meta.setAttribute("font-size", "11");
-    meta.setAttribute("fill", colors.meta);
-    meta.textContent = note || (contact.source || (role === "parent" ? "紹介元" : "紹介先"));
+    meta.setAttribute("font-size", "10.5");
+    meta.setAttribute("fill", metaColor);
+    if (isExternal) {
+      meta.textContent = "未登録の紹介元";
+    } else if (isSelected) {
+      meta.textContent = "選択中";
+    } else if (isRoot) {
+      meta.textContent = childrenCount ? `起点 ・ 紹介先 ${childrenCount}人` : "ネットワークの起点";
+    } else {
+      meta.textContent = childrenCount ? `紹介先 ${childrenCount}人` : (contact.source || "紹介先");
+    }
     g.appendChild(meta);
 
+    if (isSelected || isRoot) {
+      const tag = document.createElementNS(NS, "text");
+      tag.setAttribute("x", pos.x);
+      tag.setAttribute("y", pos.y - h / 2 - 10);
+      tag.setAttribute("text-anchor", "middle");
+      tag.setAttribute("font-size", "10");
+      tag.setAttribute("font-weight", "800");
+      tag.setAttribute("fill", isSelected ? "#1e5b43" : "#6b786f");
+      tag.textContent = isSelected ? "SELECTED" : "START";
+      g.appendChild(tag);
+    }
+
     add(g);
-    allNodeRects.push({ x, y, w, h, role, id: contact.id });
   }
 
-  // background caption
-  const caption = document.createElementNS(NS, "text");
-  caption.setAttribute("x", 20);
-  caption.setAttribute("y", 28);
-  caption.setAttribute("font-size", "12");
-  caption.setAttribute("fill", "#6a726b");
-  caption.textContent = `${focus.name} さんの紹介元と紹介先のつながり`;
-  add(caption);
+  positions.forEach(makeNode);
 
-  // draw parent chain lines and nodes
-  parentPositions.forEach((pos, index) => {
-    const next = index === parentPositions.length - 1 ? center : parentPositions[index + 1];
-    drawLine(pos.x + 76, pos.y, next.x - 85, next.y, "#79a18f");
-  });
+  // A compact title inside the canvas reinforces how to read the graph.
+  const title = document.createElementNS(NS, "text");
+  const rawXs = positions.map(p => p.x);
+  const rawYs = positions.map(p => p.y);
+  const minX = Math.min(...rawXs) - 120;
+  const minY = Math.min(...rawYs) - 105;
+  title.setAttribute("x", minX + 8);
+  title.setAttribute("y", minY + 24);
+  title.setAttribute("font-size", "12");
+  title.setAttribute("font-weight", "700");
+  title.setAttribute("fill", "#667168");
+  title.textContent = `${focus.name} さんを含む紹介ネットワーク`;
+  add(title);
 
-  parentPositions.forEach((pos, index) => {
-    const note = index === parentPositions.length - 1 ? "直接の紹介元" : "紹介元";
-    makeNode(pos.x, pos.y, pos.contact, "parent", note);
-  });
+  const margin = 150;
+  const maxX = Math.max(...rawXs) + 120;
+  const maxY = Math.max(...rawYs) + 95;
+  let x = minX - margin;
+  let y = minY - margin;
+  let w = (maxX - minX) + margin * 2;
+  let h = (maxY - minY) + margin * 2;
 
-  // draw child lines recursively
-  function drawChildConnections(node) {
-    if (!node?.children?.length) return;
-    const parentPos = node.contact.id === focus.id ? center : positionMap[node.contact.id];
-    node.children.forEach(child => {
-      const childPos = positionMap[child.contact.id];
-      if (parentPos && childPos) {
-        const startX = node.contact.id === focus.id ? center.x + 90 : parentPos.x + 76;
-        const startY = parentPos.y;
-        const endX = childPos.x - 76;
-        const endY = childPos.y;
-        drawLine(startX, startY, endX, endY, "#d1a158");
-      }
-      drawChildConnections(child);
-    });
+  // Keep small networks comfortably sized without making nodes enormous.
+  if (w < 980) {
+    const diff = 980 - w;
+    x -= diff / 2;
+    w = 980;
   }
-  drawChildConnections(tree);
-
-  // center node
-  makeNode(center.x, center.y, focus, "center", focus.source || "選択中の人物");
-
-  // child nodes
-  positions.forEach(pos => {
-    const children = directChildrenOf(pos.contact).length;
-    const note = children ? `紹介先 ${children}人` : (pos.contact.source || "紹介先");
-    makeNode(pos.x, pos.y, pos.contact, "child", note);
-  });
-
-  // helper: if no parent/no child, show hints
-  if (!parentChain.length) {
-    const text = document.createElementNS(NS, "text");
-    text.setAttribute("x", 120);
-    text.setAttribute("y", center.y - 54);
-    text.setAttribute("font-size", "11");
-    text.setAttribute("fill", "#91a097");
-    text.textContent = "紹介元の登録はありません";
-    add(text);
+  if (h < 620) {
+    const diff = 620 - h;
+    y -= diff / 2;
+    h = 620;
   }
 
-  if (!positions.length) {
-    const text = document.createElementNS(NS, "text");
-    text.setAttribute("x", 660);
-    text.setAttribute("y", center.y - 54);
-    text.setAttribute("font-size", "11");
-    text.setAttribute("fill", "#9a8b73");
-    text.textContent = "紹介先の登録はありません";
-    add(text);
-  }
+  networkBaseViewBox = { x, y, w, h };
+  networkCurrentViewBox = { ...networkBaseViewBox };
+  applyNetworkViewBox();
 }
 
 function addServiceRow(data = { name: "", priority: "medium" }) {
@@ -806,6 +963,55 @@ if (els.networkContactSelect) {
     selectedNetworkContactId = event.target.value;
     renderNetworkView();
   });
+}
+
+if (els.networkZoomIn) {
+  els.networkZoomIn.addEventListener("click", () => zoomNetworkMap(0.78));
+  els.networkZoomOut.addEventListener("click", () => zoomNetworkMap(1.28));
+  els.networkFit.addEventListener("click", fitNetworkMap);
+}
+
+if (els.networkMapSvg) {
+  els.networkMapSvg.addEventListener("wheel", event => {
+    event.preventDefault();
+    zoomNetworkMap(event.deltaY < 0 ? 0.88 : 1.14);
+  }, { passive: false });
+
+  els.networkMapSvg.addEventListener("pointerdown", event => {
+    if (event.target.closest?.(".network-svg-node")) return;
+    networkDragState = {
+      pointerId: event.pointerId,
+      clientX: event.clientX,
+      clientY: event.clientY,
+      viewBox: { ...networkCurrentViewBox }
+    };
+    els.networkMapSvg.setPointerCapture?.(event.pointerId);
+    els.networkMapSvg.classList.add("dragging");
+  });
+
+  els.networkMapSvg.addEventListener("pointermove", event => {
+    if (!networkDragState || networkDragState.pointerId !== event.pointerId) return;
+    const rect = els.networkMapSvg.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const dx = event.clientX - networkDragState.clientX;
+    const dy = event.clientY - networkDragState.clientY;
+    const scaleX = networkDragState.viewBox.w / rect.width;
+    const scaleY = networkDragState.viewBox.h / rect.height;
+    networkCurrentViewBox = {
+      ...networkDragState.viewBox,
+      x: networkDragState.viewBox.x - dx * scaleX,
+      y: networkDragState.viewBox.y - dy * scaleY
+    };
+    applyNetworkViewBox();
+  });
+
+  const endNetworkDrag = event => {
+    if (!networkDragState || networkDragState.pointerId !== event.pointerId) return;
+    networkDragState = null;
+    els.networkMapSvg.classList.remove("dragging");
+  };
+  els.networkMapSvg.addEventListener("pointerup", endNetworkDrag);
+  els.networkMapSvg.addEventListener("pointercancel", endNetworkDrag);
 }
 
 els.prioritySegment.addEventListener("click", event => {
