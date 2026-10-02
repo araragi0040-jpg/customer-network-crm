@@ -257,11 +257,8 @@ function addRelationship_(r) {
   var sh = sheet_(SHEETS.relationships);
   var rows = objects_(sh);
   for (var i = 0; i < rows.length; i++) {
-    if (
-      String(rows[i].fromId) === String(r.fromId) &&
-      String(rows[i].toId) === String(r.toId)
-    ) {
-      throw new Error('同じ紹介関係がすでにあります。');
+    if (String(rows[i].toId) === String(r.toId)) {
+      throw new Error('この人物にはすでに紹介元が登録されています。紹介元は最初の1人のみ記録します。');
     }
   }
 

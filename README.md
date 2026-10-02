@@ -1,6 +1,6 @@
-# Connect CRM v006 — Googleスプレッドシート / GAS連携版
+# Connect CRM v006.2 — Googleスプレッドシート / GAS連携版
 
-v006は、GitHub Pages上の静的Webアプリから **GAS WebアプリをAPIとして利用し、Googleスプレッドシートへ永続保存**する版です。
+v006.2は、GitHub Pages上の静的Webアプリから **GAS WebアプリをAPIとして利用し、Googleスプレッドシートへ永続保存**する版です。
 
 ## データ構造
 
@@ -18,7 +18,7 @@ v006は、GitHub Pages上の静的Webアプリから **GAS WebアプリをAPIと
 
 ### 1. スプレッドシートを用意
 
-同梱の `data/connect-crm-v006-sample.xlsx` をGoogle DriveへアップロードしてGoogleスプレッドシートとして開くか、空のスプレッドシートでも構いません。
+同梱の `data/connect-crm-v006.2-sample.xlsx` をGoogle DriveへアップロードしてGoogleスプレッドシートとして開くか、空のスプレッドシートでも構いません。
 
 ### 2. GASを貼り付け
 
@@ -65,7 +65,7 @@ Connect CRMの **連携設定** 画面で、
 
 ## 初回データ移行
 
-ブラウザ側にv005以前のデータが残っている場合、v006は可能な範囲でローカルキャッシュへ移行します。
+ブラウザ側にv005以前のデータが残っている場合、v006.2は可能な範囲でローカルキャッシュへ移行します。
 
 そのデータをスプレッドシートへ入れたい場合は、**連携設定 → この画面 → スプシ → 全データを反映** を一度実行してください。
 
@@ -78,7 +78,7 @@ Connect CRMの **連携設定** 画面で、
 ## ファイル構成
 
 ```text
-customer-network-crm-v006/
+customer-network-crm-v006.2/
 ├─ index.html
 ├─ styles.css
 ├─ app.js
@@ -89,7 +89,7 @@ customer-network-crm-v006/
 │  ├─ SampleData.gs
 │  └─ appsscript.json
 └─ data/
-   ├─ connect-crm-v006-sample.xlsx
+   ├─ connect-crm-v006.2-sample.xlsx
    ├─ people.csv
    ├─ relationships.csv
    ├─ services.csv
@@ -97,3 +97,17 @@ customer-network-crm-v006/
    ├─ sample-data.json
    └─ sample-data-normalized.json
 ```
+
+
+## v006.2 GAS互換修正
+
+Apps Scriptの構文解析でエラーになりうる `||=`、`??`、`Object.fromEntries()`、アロー関数等をGAS互換性重視の書き方へ変更しました。
+画像で発生していた Code.gs 46行目の `Unexpected token =` は修正済みです。
+
+
+## v006.2 紹介元ルール
+
+- 1人の人物に登録できる紹介元は **最初の1人のみ** です。
+- 同じ紹介先へ2本目の紹介関係を追加しようとすると、Webアプリ側とGAS側の両方で登録を止めます。
+- 一方で `A → B → C → D` のような紹介の連鎖は何段階でも記録できます。
+- サンプルデータは28人・紹介関係25件で、紹介先IDの重複はありません。
