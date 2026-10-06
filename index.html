@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f4f7f8" />
-  <title>Connect CRM v008</title>
+  <title>Connect CRM v007</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
@@ -15,7 +15,7 @@
         <div class="brand-mark">C</div>
         <div class="brand-copy">
           <strong>Connect CRM</strong>
-          <span>Solo business CRM / v008 UI Refresh</span>
+          <span>Solo business CRM / v007 UI Refresh</span>
         </div>
       </div>
 
@@ -81,66 +81,86 @@
       </header>
 
       <section class="view active" id="dashboardView">
-        <section class="hero-panel">
-          <div class="hero-copy">
-            <div class="hero-badge">Relationship-first CRM</div>
-            <h2>紹介の流れまで追える、<br>個人事業主向けCRM。</h2>
-            <p>誰とつながり、誰がどのサービス候補で、次に何をするか。必要な情報を分断せず、日々の行動に直結する画面構成へ整えています。</p>
-            <div class="hero-actions">
-              <button class="primary-btn" data-jump="contacts">人物一覧を見る</button>
-              <button class="secondary-btn" data-jump="network">関係マップを見る</button>
+        <section class="mobile-home-hero surface-card">
+          <div class="home-hero-top">
+            <div>
+              <p class="eyebrow">SMARTPHONE HOME</p>
+              <h2>今日の管理を、すぐ開けるホーム。</h2>
+              <p>スクロールを減らし、まず使う画面へ最短で移動できる構成にしています。</p>
             </div>
-          </div>
-          <div class="hero-side">
-            <div class="hero-side-card">
-              <span class="mini-label">このアプリで見ること</span>
-              <ul class="check-list">
-                <li>人物情報と紹介経路</li>
-                <li>サービス別の候補優先度</li>
-                <li>次回アクションと未完了の追跡</li>
-                <li>GAS / スプレッドシートとの同期</li>
-              </ul>
-            </div>
+            <button class="primary-btn home-add-btn" id="homeAddContactBtn">＋ 人物追加</button>
           </div>
         </section>
 
-        <div class="metrics-grid">
-          <article class="metric-card featured"><span>登録人物</span><strong id="metricContacts">0</strong><small>人物マスタ</small></article>
-          <article class="metric-card"><span>紹介関係</span><strong id="metricRelations">0</strong><small>紹介元 → 紹介先</small></article>
-          <article class="metric-card"><span>高優先度候補</span><strong id="metricHigh">0</strong><small>サービス単位</small></article>
-          <article class="metric-card"><span>次回アクション</span><strong id="metricActions">0</strong><small>未完了</small></article>
+        <div class="metrics-grid compact-home-metrics">
+          <article class="metric-card featured"><span>人物</span><strong id="metricContacts">0</strong><small>登録人数</small></article>
+          <article class="metric-card"><span>紹介</span><strong id="metricRelations">0</strong><small>紹介関係</small></article>
+          <article class="metric-card"><span>候補</span><strong id="metricHigh">0</strong><small>高優先度</small></article>
+          <article class="metric-card"><span>行動</span><strong id="metricActions">0</strong><small>未完了</small></article>
         </div>
 
-        <div class="dashboard-columns">
-          <article class="panel emphasis-panel">
-            <div class="panel-head">
-              <div>
-                <p class="eyebrow">FOCUS NOW</p>
-                <h3>次にやること</h3>
-              </div>
-              <button class="text-btn" data-jump="actions">すべて見る</button>
+        <section class="quick-nav-panel panel home-panel-tight">
+          <div class="panel-head compact">
+            <div>
+              <p class="eyebrow">QUICK ACCESS</p>
+              <h3>よく使う画面</h3>
             </div>
-            <div id="upcomingActions" class="stack-list"></div>
+          </div>
+          <div class="quick-nav-grid">
+            <button class="quick-nav-card" data-jump="contacts">
+              <span class="quick-nav-icon">◉</span>
+              <strong>人物</strong>
+              <small>人物情報を見る</small>
+            </button>
+            <button class="quick-nav-card" data-jump="relationships">
+              <span class="quick-nav-icon">↗</span>
+              <strong>紹介関係</strong>
+              <small>紹介の流れを見る</small>
+            </button>
+            <button class="quick-nav-card" data-jump="actions">
+              <span class="quick-nav-icon">✓</span>
+              <strong>次回アクション</strong>
+              <small>次にやること</small>
+            </button>
+            <button class="quick-nav-card" data-jump="network">
+              <span class="quick-nav-icon">◌</span>
+              <strong>関係マップ</strong>
+              <small>広がりを確認</small>
+            </button>
+          </div>
+        </section>
+
+        <div class="home-two-panels">
+          <article class="panel home-panel-tight">
+            <div class="panel-head compact">
+              <div>
+                <p class="eyebrow">TODAY</p>
+                <h3>直近アクション</h3>
+              </div>
+              <button class="text-btn" data-jump="actions">一覧へ</button>
+            </div>
+            <div id="upcomingActions" class="stack-list compact-stack"></div>
           </article>
-          <article class="panel">
-            <div class="panel-head">
+
+          <article class="panel home-panel-tight desktop-only-home-panel">
+            <div class="panel-head compact">
               <div>
                 <p class="eyebrow">NETWORK HUB</p>
                 <h3>紹介が広がっている人</h3>
               </div>
-              <button class="text-btn" data-jump="network">マップを見る</button>
+              <button class="text-btn" data-jump="network">マップへ</button>
             </div>
-            <div id="hubList" class="stack-list"></div>
+            <div id="hubList" class="stack-list compact-stack"></div>
           </article>
         </div>
 
-        <article class="panel">
-          <div class="panel-head">
+        <article class="panel home-panel-tight desktop-home-table">
+          <div class="panel-head compact">
             <div>
               <p class="eyebrow">PEOPLE PREVIEW</p>
-              <h3>最近の人物一覧</h3>
+              <h3>最近の人物</h3>
             </div>
-            <button class="text-btn" data-jump="contacts">一覧を見る</button>
+            <button class="text-btn" data-jump="contacts">一覧へ</button>
           </div>
           <div class="table-wrap">
             <table>
