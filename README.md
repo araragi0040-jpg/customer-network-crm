@@ -1,113 +1,35 @@
-# Connect CRM v006.2 — Googleスプレッドシート / GAS連携版
+# Connect CRM v007
 
-v006.2は、GitHub Pages上の静的Webアプリから **GAS WebアプリをAPIとして利用し、Googleスプレッドシートへ永続保存**する版です。
+個人事業主向けの顧客管理モックです。  
+人物管理・紹介関係・サービス候補・次回アクション・関係マップ・GAS/Googleスプレッドシート連携を、より実サービスに近い見た目と操作感にUI改善した版です。
 
-## データ構造
+## v007での主なUI改善
 
-スプレッドシートは5シート構成です。
+- 全体を **SaaS風の情報設計** に再整理
+- 左サイドバー + 上部ヘッダーで、現在地が分かりやすい構成へ変更
+- ダッシュボードを **行動優先** の見せ方に整理
+- 人物一覧・紹介関係・アクション・候補カードの視認性を向上
+- 関係マップ画面・連携設定画面のUIを整理
+- モーダルフォームを見やすく改善
+- レスポンシブ時のレイアウトを調整
 
-1. **人物マスタ** — `id / name / metDate / source / overallPriority / note / createdAt / updatedAt`
-2. **紹介関係** — `id / fromId / toId / memo / createdAt / updatedAt`
-3. **サービス候補** — `id / personId / serviceName / priority / note / createdAt / updatedAt`
-4. **次回アクション** — `id / personId / actionDate / actionText / done / completedAt / createdAt / updatedAt`
-5. **設定** — `key / value / description`
+## 構成
 
-人物と紹介関係を分離しているため、**複数紹介元・複数紹介先・網目状の関係マップ**に対応します。サービス候補も1人物に複数行を持てます。
+- `index.html` : 画面本体
+- `styles.css` : UIスタイル
+- `app.js` : データ処理 / 描画 / GAS連携
+- `data/` : サンプルデータ
+- `gas/` : Apps Script 用ファイル
 
-## セットアップ手順
+## 紹介関係のルール
 
-### 1. スプレッドシートを用意
+- 1人の紹介先につき、紹介元は最初の1人だけ記録
+- ただし `A → B → C → D` のような紹介の連鎖は保持
 
-同梱の `data/connect-crm-v006.2-sample.xlsx` をGoogle DriveへアップロードしてGoogleスプレッドシートとして開くか、空のスプレッドシートでも構いません。
+## 起動方法
 
-### 2. GASを貼り付け
+GitHub Pages やローカル環境で `index.html` を開くだけで確認できます。
 
-対象スプレッドシートで **拡張機能 → Apps Script** を開き、`gas` フォルダの以下を作成・貼り付けます。
+## GAS連携
 
-- `Code.gs`
-- `Setup.gs`
-- `SampleData.gs`
-- `appsscript.json`（プロジェクトのマニフェスト表示をONにして置換）
-
-### 3. 初期設定
-
-Apps Scriptエディタから **`setupConnectCRM()`** を1回実行し、権限を許可します。
-
-これにより、
-- 必要な5シートを作成/整備
-- 対象スプレッドシートIDをScript Propertiesに保存
-- `設定` シートに `connection_key` を生成
-
-します。
-
-サンプルをスプシへ投入する場合は **`seedSampleData()`** を実行します。
-
-### 4. Webアプリとしてデプロイ
-
-Apps Scriptの **デプロイ → 新しいデプロイ → ウェブアプリ** を選びます。
-
-- 実行するユーザー：**自分**
-- アクセスできるユーザー：GitHub Pagesからアクセスできる設定（試作では「全員」）
-
-デプロイ後の `/exec` URLをコピーします。
-
-> 注意: 静的GitHub Pagesから直接GASへアクセスする試作構成のため、WebアプリURL自体は公開アクセス可能な設定が必要です。書き込み/読み込みは `connection_key` でも確認していますが、これは本格的な認証の代替ではありません。多人数向けSaaS本番ではFirebase/Supabase等の認証・DB構成を推奨します。
-
-### 5. Connect CRMで接続
-
-Connect CRMの **連携設定** 画面で、
-- GAS WebアプリURL
-- `設定` シートの `connection_key`
-
-を入力し **設定を保存・接続確認** を押します。
-
-接続後は人物・紹介関係・サービス候補・次回アクションの編集が自動でスプレッドシートへ保存されます。
-
-## 初回データ移行
-
-ブラウザ側にv005以前のデータが残っている場合、v006.2は可能な範囲でローカルキャッシュへ移行します。
-
-そのデータをスプレッドシートへ入れたい場合は、**連携設定 → この画面 → スプシ → 全データを反映** を一度実行してください。
-
-この操作はスプレッドシート側の4つのデータシートを置き換えるため、初回移行時だけ使用する想定です。
-
-## GitHub Pages
-
-`index.html / styles.css / app.js / data` をリポジトリへアップロードします。GASフォルダはGitHubに保管しても構いませんが、実行はApps Script側です。
-
-## ファイル構成
-
-```text
-customer-network-crm-v006.2/
-├─ index.html
-├─ styles.css
-├─ app.js
-├─ README.md
-├─ gas/
-│  ├─ Code.gs
-│  ├─ Setup.gs
-│  ├─ SampleData.gs
-│  └─ appsscript.json
-└─ data/
-   ├─ connect-crm-v006.2-sample.xlsx
-   ├─ people.csv
-   ├─ relationships.csv
-   ├─ services.csv
-   ├─ actions.csv
-   ├─ sample-data.json
-   └─ sample-data-normalized.json
-```
-
-
-## v006.2 GAS互換修正
-
-Apps Scriptの構文解析でエラーになりうる `||=`、`??`、`Object.fromEntries()`、アロー関数等をGAS互換性重視の書き方へ変更しました。
-画像で発生していた Code.gs 46行目の `Unexpected token =` は修正済みです。
-
-
-## v006.2 紹介元ルール
-
-- 1人の人物に登録できる紹介元は **最初の1人のみ** です。
-- 同じ紹介先へ2本目の紹介関係を追加しようとすると、Webアプリ側とGAS側の両方で登録を止めます。
-- 一方で `A → B → C → D` のような紹介の連鎖は何段階でも記録できます。
-- サンプルデータは28人・紹介関係25件で、紹介先IDの重複はありません。
+`gas` フォルダ内の `Code.gs / Setup.gs / SampleData.gs / appsscript.json` を Apps Script に反映し、`setupConnectCRM()` を実行してください。
