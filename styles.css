@@ -604,3 +604,57 @@ html.menu-open,body.menu-open{overflow:hidden}
 
 /* Guarantee only the selected tab is rendered on mobile and desktop. */
 .view:not(.active){display:none!important}
+
+/* ===== v012: non-home screens use a compact mobile app bar ===== */
+@media (max-width:720px){
+  body:not([data-current-view="dashboard"]) .topbar{
+    position:sticky;
+    top:max(0px, env(safe-area-inset-top,0px));
+    z-index:24;
+    margin:0 0 10px;
+    padding:6px 2px 8px;
+    border:0;
+    border-radius:0;
+    background:rgba(244,247,248,.94);
+    box-shadow:none;
+    backdrop-filter:blur(12px);
+    display:grid;
+    grid-template-columns:44px minmax(0,1fr);
+    gap:8px;
+    align-items:center;
+  }
+  body:not([data-current-view="dashboard"]) .topbar-main{
+    min-width:0;
+    display:flex;
+    align-items:center;
+  }
+  body:not([data-current-view="dashboard"]) .topbar-main .eyebrow,
+  body:not([data-current-view="dashboard"]) .topbar-main .page-subtitle,
+  body:not([data-current-view="dashboard"]) .topbar-actions{
+    display:none!important;
+  }
+  body:not([data-current-view="dashboard"]) .topbar h1{
+    margin:0;
+    font-size:20px;
+    line-height:1.2;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  body:not([data-current-view="dashboard"]) .mobile-menu-btn{
+    width:42px;
+    height:42px;
+    min-height:42px;
+    border:1px solid var(--line);
+    background:#fff;
+    box-shadow:var(--shadow-soft);
+  }
+  body:not([data-current-view="dashboard"]) .section-intro.surface-card{
+    display:none;
+  }
+  body:not([data-current-view="dashboard"]) .view.active > .toolbar:first-of-type,
+  body:not([data-current-view="dashboard"]) .view.active > .panel:first-of-type,
+  body:not([data-current-view="dashboard"]) .view.active > .settings-grid:first-of-type{
+    margin-top:0;
+  }
+}
