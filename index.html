@@ -2,9 +2,9 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#f4f7f8" />
-  <title>Connect CRM v010</title>
+  <title>Connect CRM v011</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
@@ -20,7 +20,7 @@
         <div class="brand-mark">C</div>
         <div class="brand-copy">
           <strong>Connect CRM</strong>
-          <span>Solo business CRM / v010 UI Refresh</span>
+          <span>Solo business CRM / Mobile QA v011</span>
         </div>
       </div>
 
@@ -207,6 +207,7 @@
               <tbody id="contactsTable"></tbody>
             </table>
           </div>
+          <div class="load-more-wrap"><button class="secondary-btn hidden" id="contactsMoreBtn">もっと見る</button></div>
         </article>
       </section>
 
@@ -238,6 +239,7 @@
               <tbody id="relationshipsTable"></tbody>
             </table>
           </div>
+          <div class="load-more-wrap"><button class="secondary-btn hidden" id="relationshipsMoreBtn">もっと見る</button></div>
         </article>
       </section>
 
@@ -256,6 +258,7 @@
           <select id="serviceFilter"><option value="">すべてのサービス</option></select>
         </div>
         <div id="prospectGrid" class="prospect-grid"></div>
+        <div class="load-more-wrap"><button class="secondary-btn hidden" id="prospectsMoreBtn">もっと見る</button></div>
       </section>
 
       <section class="view" id="actionsView">
@@ -278,6 +281,7 @@
             <span class="count-label" id="actionsCountLabel">0件</span>
           </div>
           <div id="actionsList" class="action-list"></div>
+          <div class="load-more-wrap"><button class="secondary-btn hidden" id="actionsMoreBtn">もっと見る</button></div>
         </article>
       </section>
 

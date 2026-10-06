@@ -504,7 +504,7 @@ input,select,textarea,button{min-height:44px}
   .home-two-panels{grid-template-columns:1fr;gap:10px}
   .home-panel-tight{padding:14px}
   .desktop-only-home-panel,.desktop-home-table{display:none}
-  #dashboardView{display:grid;gap:10px}
+  #dashboardView.active{display:grid;gap:10px}
   #dashboardView .panel,#dashboardView .surface-card,#dashboardView .metrics-grid{margin-top:0}
   .compact-stack .stack-item{grid-template-columns:auto minmax(0,1fr);gap:10px;padding:10px}
   .compact-stack .stack-item .date-chip{grid-column:2;justify-self:start;margin-top:2px}
@@ -555,3 +555,52 @@ body.menu-open{overflow:hidden}
   .topbar-main{padding-top:2px}
   .mobile-menu-btn{width:42px;height:42px;border-radius:12px}
 }
+
+/* ===== v011 production mobile stability fixes ===== */
+html,body{max-width:100%;overflow-x:hidden}
+html.menu-open,body.menu-open{overflow:hidden;overscroll-behavior:none}
+body{min-width:0}
+*{min-width:0}
+button,input,select,textarea{max-width:100%}
+input,textarea{overflow-wrap:anywhere}
+.surface-card,.panel,.metric-card,.prospect-card,.stack-item,.action-row,.workspace-card{overflow-wrap:anywhere;word-break:break-word}
+.mobile-menu-overlay{touch-action:none}
+.load-more-wrap{display:flex;justify-content:center;padding:14px 0 2px}
+.load-more-wrap .secondary-btn{width:min(100%,360px)}
+
+@media (max-width:980px){
+  .sidebar{
+    height:100vh;height:100dvh;
+    padding-top:max(18px,env(safe-area-inset-top,0px));
+    padding-bottom:max(18px,env(safe-area-inset-bottom,0px));
+    overscroll-behavior:contain;-webkit-overflow-scrolling:touch
+  }
+  .brand{display:flex;align-items:center}
+  .workspace-card{display:none}
+  .sidebar-footer{display:grid}
+  .topbar-actions{display:none}
+  .mobile-menu-overlay{-webkit-backdrop-filter:blur(2px)}
+}
+
+@media (max-width:720px){
+  .main{padding-top:max(10px,env(safe-area-inset-top,0px));padding-left:10px;padding-right:10px}
+  .topbar{grid-template-columns:42px minmax(0,1fr);gap:10px;align-items:center}
+  .topbar-main{min-width:0}
+  .topbar-main h1{overflow-wrap:anywhere}
+  .mobile-menu-btn{align-self:start}
+  .contact-dialog,.small-dialog{
+    inset:0;margin:0;width:100%;max-width:none;height:100vh;height:100dvh;max-height:none;border-radius:0
+  }
+  .contact-dialog form{height:100vh;height:100dvh;max-height:none;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .dialog-head{padding-top:max(0px,env(safe-area-inset-top,0px))}
+  .dialog-actions{padding-bottom:max(8px,env(safe-area-inset-bottom,0px))}
+  table td, .prospect-card p, .action-main strong, .stack-main strong{overflow-wrap:anywhere;word-break:break-word}
+  .arrow-col[data-label="方向"]::before{display:none}
+  .arrow-col[data-label="方向"]{padding:2px 0;border-bottom:0;color:var(--accent);font-size:20px;font-weight:900}
+}
+/* Keep vertical page scrolling controlled by the browser root; clip only horizontal overflow. */
+html,body{overflow-x:clip;overflow-y:visible}
+html.menu-open,body.menu-open{overflow:hidden}
+
+/* Guarantee only the selected tab is rendered on mobile and desktop. */
+.view:not(.active){display:none!important}
