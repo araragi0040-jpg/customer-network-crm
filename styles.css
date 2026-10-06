@@ -658,3 +658,18 @@ html.menu-open,body.menu-open{overflow:hidden}
     margin-top:0;
   }
 }
+
+/* ===== v013 hard view isolation ===== */
+.view[hidden]{display:none!important}
+body[data-current-view="dashboard"] #dashboardView{display:block}
+body:not([data-current-view="dashboard"]) #dashboardView{display:none!important}
+
+/* On smartphone, HOME-only visual elements never survive into MANAGE views. */
+@media (max-width:720px){
+  body:not([data-current-view="dashboard"]) .topbar .eyebrow,
+  body:not([data-current-view="dashboard"]) .topbar .page-subtitle,
+  body:not([data-current-view="dashboard"]) .topbar-actions{display:none!important}
+  body:not([data-current-view="dashboard"]) .topbar{
+    min-height:54px;
+  }
+}

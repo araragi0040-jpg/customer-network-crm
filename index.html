@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#f4f7f8" />
-  <title>Connect CRM v012</title>
+  <title>Connect CRM v013</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body data-current-view="dashboard">
@@ -86,7 +86,7 @@
         </div>
       </header>
 
-      <section class="view active" id="dashboardView">
+      <section class="view active" id="dashboardView" aria-hidden="false">
         <section class="mobile-home-hero surface-card">
           <div class="home-hero-top">
             <div>
@@ -179,7 +179,7 @@
         </article>
       </section>
 
-      <section class="view" id="contactsView">
+      <section class="view" id="contactsView" hidden aria-hidden="true">
         <div class="section-intro surface-card">
           <div>
             <p class="eyebrow">MASTER DATA</p>
@@ -211,7 +211,7 @@
         </article>
       </section>
 
-      <section class="view" id="relationshipsView">
+      <section class="view" id="relationshipsView" hidden aria-hidden="true">
         <div class="section-intro surface-card">
           <div>
             <p class="eyebrow">REFERRAL FLOW</p>
@@ -243,7 +243,7 @@
         </article>
       </section>
 
-      <section class="view" id="prospectsView">
+      <section class="view" id="prospectsView" hidden aria-hidden="true">
         <div class="section-intro surface-card">
           <div>
             <p class="eyebrow">SERVICE PIPELINE</p>
@@ -261,7 +261,7 @@
         <div class="load-more-wrap"><button class="secondary-btn hidden" id="prospectsMoreBtn">もっと見る</button></div>
       </section>
 
-      <section class="view" id="actionsView">
+      <section class="view" id="actionsView" hidden aria-hidden="true">
         <div class="section-intro surface-card">
           <div>
             <p class="eyebrow">FOLLOW UP</p>
@@ -285,7 +285,7 @@
         </article>
       </section>
 
-      <section class="view" id="networkView">
+      <section class="view" id="networkView" hidden aria-hidden="true">
         <div class="section-intro surface-card">
           <div>
             <p class="eyebrow">RELATIONSHIP MAP</p>
@@ -307,7 +307,7 @@
         </article>
       </section>
 
-      <section class="view" id="settingsView">
+      <section class="view" id="settingsView" hidden aria-hidden="true">
         <div class="section-intro surface-card">
           <div>
             <p class="eyebrow">SYNC SETTINGS</p>
