@@ -4,18 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f4f7f8" />
-  <title>Connect CRM v009</title>
+  <title>Connect CRM v007</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
+<div id="mobileMenuOverlay" class="mobile-menu-overlay hidden"></div>
 <div class="app-shell">
   <aside class="sidebar">
     <div class="sidebar-top">
+      <div class="mobile-sidebar-head">
+        <strong>メニュー</strong>
+        <button class="icon-btn mobile-close-btn" id="closeMobileMenuBtn" type="button">×</button>
+      </div>
       <div class="brand">
         <div class="brand-mark">C</div>
         <div class="brand-copy">
           <strong>Connect CRM</strong>
-          <span>Solo business CRM / v009 UI Refresh</span>
+          <span>Solo business CRM / v007 UI Refresh</span>
         </div>
       </div>
 
@@ -66,6 +71,7 @@
   <main class="main">
     <div class="page-container">
       <header class="topbar">
+        <button class="icon-btn mobile-menu-btn" id="openMobileMenuBtn" type="button">☰</button>
         <div class="topbar-main">
           <p class="eyebrow">CONNECT CRM</p>
           <h1 id="pageTitle">ホーム</h1>
